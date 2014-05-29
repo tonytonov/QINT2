@@ -7,10 +7,9 @@
 #include <HIntLib/niederreitermatrix.h>
 #include <iostream>
 
-
 class TestIntegrand: public Integrand
 {
-    real operator() (const real [] x)
+    public real operator() (const real [] x)
     {
       return x;
     }
