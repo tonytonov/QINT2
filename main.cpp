@@ -13,16 +13,15 @@
 #include <iostream>
 #include <numeric>
 
-namespace H = HIntLib;
-using namespace H;
+using namespace HIntLib;
 using namespace std;
 
-class TestFunction : public H::Integrand
+class TestFunction : public Integrand
 {
 public:
     TestFunction(int s) : Integrand(s) {}
     virtual ~TestFunction() {}
-    virtual H::real operator() (const H::real *x)
+    virtual real operator() (const real *x)
     {
       vector<real> v(x, x + this->getDimension());
       real sum = 0;
