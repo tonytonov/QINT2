@@ -9,3 +9,5 @@ INCLUDEPATH += .
 # Input
 HEADERS +=
 SOURCES += main.cpp
+
+CONFIG += c++11

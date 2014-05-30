@@ -11,18 +11,23 @@
 #include <HIntLib/defaults.h>
 #include <HIntLib/mcpointset.h>
 #include <iostream>
+#include <numeric>
 
 namespace H = HIntLib;
 using namespace H;
+using namespace std;
 
 class TestFunction : public H::Integrand
 {
 public:
     TestFunction(int s) : Integrand(s) {}
     virtual ~TestFunction() {}
-    virtual H::real operator() (const H::real[])
+    virtual H::real operator() (const H::real *x)
     {
-        return 0;
+      vector<real> v(x, x + this->getDimension());
+      real sum = 0;
+      for (int n : v) sum += n;
+      return sum;
     }
 
 };
