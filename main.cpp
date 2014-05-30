@@ -1,23 +1,44 @@
 #include <HIntLib/integrand.h>
 #include <HIntLib/integrator.h>
+#include <HIntLib/mcintegrator.h>
+#include <HIntLib/mersennetwister.h>
+#include <HIntLib/qmcintegrator.h>
 #include <HIntLib/hypercube.h>
 #include <HIntLib/esterr.h>
 #include <HIntLib/digitalnet2.h>
 #include <HIntLib/sobolmatrix.h>
 #include <HIntLib/niederreitermatrix.h>
+#include <HIntLib/defaults.h>
+#include <HIntLib/mcpointset.h>
 #include <iostream>
 
-void calculateIntegral (Integrand& f, Integrator& integrator)
+namespace H = HIntLib;
+using namespace H;
+
+class TestFunction : public H::Integrand
+{
+public:
+    TestFunction(int s) : Integrand(s) {}
+    virtual ~TestFunction() {}
+    virtual H::real operator() (const H::real[])
+    {
+        return 0;
+    }
+
+};
+
+void calculateIntegral (TestFunction& f, Integrator& integrator)
 {
   Hypercube h (f.getDimension());
-  cout << "Result: "
+  std::cout << "Result: "
   << integrator(f, h, 1000000, 0, 1/1000)
   << "\n";
 }
 
 int main()
 {
-    TestIntegrand f(s);
+    int s=5;
+    TestFunction f(s);
 
     MonteCarloPointSet<MersenneTwister> ps_mc;
     MCIntegrator integrator_mc (&ps_mc);
@@ -31,8 +52,8 @@ int main()
     DigitalSeq2PointSet<real> ps_sobol (matrix_sobol, true);
     QMCIntegrator integrator_sobol (&ps_sobol);
 
-    calculateIntegral(&f, &integrator_mc);
-    calculateIntegral(&f, &integrator_sobol);
-    calculateIntegral(&f, &integrator_nied);
+    calculateIntegral(f, integrator_mc);
+    calculateIntegral(f, integrator_sobol);
+    calculateIntegral(f, integrator_nied);
 
 }
