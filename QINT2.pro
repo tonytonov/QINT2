@@ -10,4 +10,6 @@ INCLUDEPATH += .
 HEADERS +=
 SOURCES += main.cpp
 
-CONFIG += c++11
+QMAKE_CXXFLAGS += -std=c++0x
+
+LIBS += -L/usr/ -lhintlib

@@ -33,7 +33,7 @@ public:
 
 void calculateIntegral (TestFunction& f, Integrator& integrator)
 {
-  Hypercube h (f.getDimension());
+  Hypercube h(f.getDimension());
   std::cout << "Result: "
   << integrator(f, h, 1000000, 0, 1/1000)
   << "\n";
