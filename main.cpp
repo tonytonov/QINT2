@@ -25,7 +25,7 @@ public:
     {
       vector<real> v(x, x + this->getDimension());
       real sum = 0;
-      for (int n : v) sum += n;
+      for (real n : v) sum += n;
       return sum;
     }
 
