@@ -7,8 +7,10 @@ TARGET = QINT2
 INCLUDEPATH += .
 
 # Input
-HEADERS +=
-SOURCES += main.cpp
+HEADERS += \
+    rqmcintegrator.h
+SOURCES += main.cpp \
+    rqmcintegrator.cpp
 
 QMAKE_CXXFLAGS += -std=c++0x
 
