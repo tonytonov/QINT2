@@ -1,5 +1,6 @@
 #include "rqmcintegrator.h"
 #include <numeric>
+#include <cmath>
 
 double sum(std::vector<double> v)
 {
@@ -29,8 +30,7 @@ Integrator::Status RQMCIntegrator::integrate(
     if (randCount == 0) return ERROR;
     int m = n / randCount;
 
-    std::vector<Statistic<>> stats;
-    stats.reserve(m);
+    std::vector<Statistic<>> stats(randCount);
     std::default_random_engine e(globalSeed);
 
     for (unsigned int i = 0; i < randCount; i++)
@@ -40,12 +40,17 @@ Integrator::Status RQMCIntegrator::integrate(
         int seed = e();
         ps->randomize(seed);
         ps->integrate(point, f, m, s);
-        stats.push_back(s);
+        stats[i] = s;
     }
 
-    std::vector<double> means(m);
-    //std::vector<double> stds(m);
-    for (auto x : stats) means.push_back(x.getMean());
-    ee.setNoErr(sum(means) / randCount * h.getVolume());
+    std::vector<double> estimates;
+    estimates.reserve(randCount);
+    std::vector<double> sqdiffs;
+    sqdiffs.reserve(randCount);
+    for (auto x : stats) estimates.push_back(x.getMean() * h.getVolume());
+    double rqmcEst = sum(estimates) / randCount;
+    for (auto x : estimates) sqdiffs.push_back(std::pow(rqmcEst - x, 2));
+    double rqmcStdError = std::sqrt(sum(sqdiffs) / randCount / (randCount - 1));
+    ee.set(rqmcEst, rqmcStdError);
     return MAX_EVAL_REACHED;
 }

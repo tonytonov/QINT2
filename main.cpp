@@ -36,33 +36,33 @@ void calculateIntegral (TestFunction& f, Integrator& integrator)
 {
   Hypercube h(f.getDimension());
   EstErr ee;
-  auto result = integrator.integrate(f, h, 100000, 0, 1/1000, ee);
-  std::cout //<< "Result: " << (result == Integrator.MAX_EVAL_REACHED ? "OK" : "Not OK") << "\n"
-            << "Estimate: " << ee.getEstimate() << "+-" << ee.getError() << "\n";
+  auto result = integrator.integrate(f, h, 100000, 0, 0, ee);
+  std::cout << "Estimate: " << ee.getEstimate() << "+-" << ee.getError() << " "
+            << "Result: " << (result == Integrator::Status::MAX_EVAL_REACHED ? "OK" : "Not OK") << "\n";
 }
 
 int main()
 {
     int s=5;
+    int rc=10;
+    int seed=42;
     TestFunction f(s);
 
     MonteCarloPointSet<MersenneTwister> ps_mc;
+    //ps_mc.randomize(seed);
     MCIntegrator integrator_mc(&ps_mc);
     integrator_mc.setMinNumEval(300);
 
     NiederreiterMatrix matrix_nied;
     DigitalNet2PointSet<real> ps_nied(matrix_nied, true, DigitalNet::CENTER);
-    QMCIntegrator integrator_nied(&ps_nied);
+    RQMCIntegrator integrator_nied(&ps_nied, rc, seed);
 
     SobolMatrix matrix_sobol;
     DigitalSeq2PointSet<real> ps_sobol(matrix_sobol, true);
-    QMCIntegrator integrator_sobol(&ps_sobol);
+    RQMCIntegrator integrator_sobol(&ps_sobol, rc, seed);
 
-    RQMCIntegrator rqmc_integrator(&ps_sobol);
-
-    //calculateIntegral(f, integrator_mc);
-    //calculateIntegral(f, integrator_sobol);
-    //calculateIntegral(f, integrator_nied);
-    calculateIntegral(f, rqmc_integrator);
+    calculateIntegral(f, integrator_mc);
+    calculateIntegral(f, integrator_sobol);
+    calculateIntegral(f, integrator_nied);
 
 }

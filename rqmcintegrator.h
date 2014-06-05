@@ -14,7 +14,7 @@ class RQMCIntegrator : public Integrator
 {
 public:
     RQMCIntegrator(Digital2PointSet* _ps, unsigned int _rn = 10, unsigned int _gs = 1)
-        : ps(_ps), randNum(_rn), globalSeed(_gs) {}
+        : ps(_ps), randCount(_rn), globalSeed(_gs) {}
 
     virtual
     Status integrate (
@@ -22,7 +22,7 @@ public:
           real reqAbsError, real reqRelError, EstErr &ee);
 private:
     Digital2PointSet* ps;
-    unsigned int randNum;
+    unsigned int randCount;
     unsigned int globalSeed;
 };
 
