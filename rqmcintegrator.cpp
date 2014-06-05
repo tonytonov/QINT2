@@ -24,17 +24,21 @@ Integrator::Status RQMCIntegrator::integrate(
 
     ps->setCube(&h);
     n = ps->getOptimalNumber(n, h);
+    ps->enableRandomize();
 
-    if (randNum == 0) return ERROR;
-    int m = n / randNum;
+    if (randCount == 0) return ERROR;
+    int m = n / randCount;
 
     std::vector<Statistic<>> stats;
     stats.reserve(m);
-    for (unsigned int i = 0; i < randNum; i++)
+    std::default_random_engine e(globalSeed);
+
+    for (unsigned int i = 0; i < randCount; i++)
     {
         Statistic<> s;
         Point point(h.getDimension());
-        ps->randomize(getSeed());
+        int seed = e();
+        ps->randomize(seed);
         ps->integrate(point, f, m, s);
         stats.push_back(s);
     }
@@ -42,6 +46,6 @@ Integrator::Status RQMCIntegrator::integrate(
     std::vector<double> means(m);
     //std::vector<double> stds(m);
     for (auto x : stats) means.push_back(x.getMean());
-    ee.setNoErr(sum(means) / randNum * h.getVolume());
+    ee.setNoErr(sum(means) / randCount * h.getVolume());
     return MAX_EVAL_REACHED;
 }
