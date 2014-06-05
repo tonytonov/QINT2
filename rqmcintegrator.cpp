@@ -18,12 +18,12 @@ Integrator::Status RQMCIntegrator::integrate(
 
     if (n == 0)
     {
-       ee.set (0.0, 0.0);
+       ee.set(0.0, 0.0);
        return ERROR;
     }
 
-    ps->setCube (&h);
-    n = ps->getOptimalNumber (n, h);
+    ps->setCube(&h);
+    n = ps->getOptimalNumber(n, h);
 
     if (randNum == 0) return ERROR;
     int m = n / randNum;
@@ -33,8 +33,8 @@ Integrator::Status RQMCIntegrator::integrate(
     for (unsigned int i = 0; i < randNum; i++)
     {
         Statistic<> s;
-        Point point (h.getDimension());
-        ps->randomize (getSeed());
+        Point point(h.getDimension());
+        ps->randomize(getSeed());
         ps->integrate(point, f, m, s);
         stats.push_back(s);
     }
