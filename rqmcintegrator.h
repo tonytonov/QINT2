@@ -12,15 +12,15 @@ using namespace HIntLib;
 class RQMCIntegrator : public Integrator
 {
 public:
-    RQMCIntegrator(PointSet* _ps) : ps(_ps) {}
+    RQMCIntegrator(PointSet* _ps, unsigned int _rn = 10) : ps(_ps), randNum(_rn) {}
 
     virtual
     Status integrate (
           Integrand &, const Hypercube &, Index maxEval,
           real reqAbsError, real reqRelError, EstErr &ee);
 private:
-    int randNum;
     PointSet* ps;
+    unsigned int randNum;
 };
 
 #endif // RQMCINTEGRATOR_H

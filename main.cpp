@@ -60,9 +60,9 @@ int main()
 
     RQMCIntegrator rqmc_integrator(&ps_sobol);
 
-    calculateIntegral(f, integrator_mc);
-    calculateIntegral(f, integrator_sobol);
-    calculateIntegral(f, integrator_nied);
+    //calculateIntegral(f, integrator_mc);
+    //calculateIntegral(f, integrator_sobol);
+    //calculateIntegral(f, integrator_nied);
     calculateIntegral(f, rqmc_integrator);
 
 }
