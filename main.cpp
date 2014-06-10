@@ -12,7 +12,11 @@
 #include <HIntLib/mcpointset.h>
 #include <rqmcintegrator.h>
 #include <iostream>
+#include <fstream>
 #include <numeric>
+#include <unistd.h>
+#include <sys/types.h>
+#include <pwd.h>
 
 using namespace HIntLib;
 using namespace std;
@@ -29,16 +33,56 @@ public:
       for (real n : v) sum += n;
       return sum;
     }
-
 };
 
-void calculateIntegral (TestFunction& f, Integrator& integrator)
+class SequenceInterceptor : public Integrand
 {
-  Hypercube h(f.getDimension());
-  EstErr ee;
-  auto result = integrator.integrate(f, h, 100000, 0, 0, ee);
-  std::cout << "Estimate: " << ee.getEstimate() << "+-" << ee.getError() << " "
-            << "Result: " << (result == Integrator::Status::MAX_EVAL_REACHED ? "OK" : "Not OK") << "\n";
+private:
+    ofstream f;
+public:
+    SequenceInterceptor(int s, const string filename = string("seq.txt")) :
+        Integrand(s)
+    {
+        struct passwd *pw = getpwuid(getuid());
+        const char *homedir = pw->pw_dir;
+        string address = string(homedir) + "/" + filename;
+        f.open(address);
+    }
+    virtual ~SequenceInterceptor()
+    {
+        f.close();
+    }
+    virtual real operator() (const real *x)
+    {
+        vector<real> v(x, x + this->getDimension());
+        string s;
+        for (real n : v)
+        {
+            s += to_string(n);
+            s += ", ";
+        }
+        s.pop_back();
+        s.pop_back();
+        f << s << "\n";
+        return 0;
+    }
+};
+
+void calculateIntegral(TestFunction& f, Integrator& integrator)
+{
+    Hypercube h(f.getDimension());
+    EstErr ee;
+    auto result = integrator.integrate(f, h, 100000, 0, 0, ee);
+    std::cout << "Estimate: " << ee.getEstimate() << "+-" << ee.getError() << " "
+              << "Result: " << (result == Integrator::Status::MAX_EVAL_REACHED ? "OK" : "Not OK") << "\n";
+}
+
+void calculateIntegral(SequenceInterceptor& si, Integrator& integrator)
+{
+    Hypercube h(si.getDimension());
+    EstErr ee;
+    auto result = integrator.integrate(si, h, 100000, 0, 0, ee);
+    std::cout << "Result: " << (result == Integrator::Status::MAX_EVAL_REACHED ? "OK" : "Not OK") << "\n";
 }
 
 int main()
@@ -47,6 +91,7 @@ int main()
     int rc=10;
     int seed=42;
     TestFunction f(s);
+    SequenceInterceptor si(s);
 
     MonteCarloPointSet<MersenneTwister> ps_mc;
     //ps_mc.randomize(seed);
@@ -61,6 +106,7 @@ int main()
     DigitalSeq2PointSet<real> ps_sobol(matrix_sobol, true);
     RQMCIntegrator integrator_sobol(&ps_sobol, rc, seed);
 
+    calculateIntegral(si, integrator_sobol);
     calculateIntegral(f, integrator_mc);
     calculateIntegral(f, integrator_sobol);
     calculateIntegral(f, integrator_nied);
