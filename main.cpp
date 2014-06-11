@@ -36,21 +36,21 @@ void calculateIntegral (TestFunction& f, Integrator& integrator)
 {
   Hypercube h(f.getDimension());
   EstErr ee;
-  auto result = integrator.integrate(f, h, 100000, 0, 0, ee);
+  auto result = integrator.integrate(f, h, 10, 0, 0, ee);
   std::cout << "Estimate: " << ee.getEstimate() << "+-" << ee.getError() << " "
             << "Result: " << (result == Integrator::Status::MAX_EVAL_REACHED ? "OK" : "Not OK") << "\n";
 }
 
 int main()
 {
-    int s=5;
-    int rc=10;
+    int s=10;
+    int rc=2;
     int seed=42;
     TestFunction f(s);
 
     MonteCarloPointSet<MersenneTwister> ps_mc;
-    //ps_mc.randomize(seed);
     MCIntegrator integrator_mc(&ps_mc);
+    integrator_mc.randomize(seed);
     integrator_mc.setMinNumEval(300);
 
     NiederreiterMatrix matrix_nied;
@@ -62,7 +62,7 @@ int main()
     RQMCIntegrator integrator_sobol(&ps_sobol, rc, seed);
 
     calculateIntegral(f, integrator_mc);
-    calculateIntegral(f, integrator_sobol);
-    calculateIntegral(f, integrator_nied);
+    //calculateIntegral(f, integrator_sobol);
+    //calculateIntegral(f, integrator_nied);
 
 }
