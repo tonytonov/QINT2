@@ -8,9 +8,12 @@ INCLUDEPATH += .
 
 # Input
 HEADERS += \
-    rqmcintegrator.h
+    rqmcintegrator.h \
+    qintintegrator.h \
+    interceptableintegrand.h
 SOURCES += main.cpp \
-    rqmcintegrator.cpp
+    rqmcintegrator.cpp \
+    qintintegrator.cpp
 
 QMAKE_CXXFLAGS += -std=c++0x
 

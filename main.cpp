@@ -10,10 +10,12 @@
 #include <HIntLib/niederreitermatrix.h>
 #include <HIntLib/defaults.h>
 #include <HIntLib/mcpointset.h>
+#include <interceptableintegrand.h>
 #include <rqmcintegrator.h>
+#include <qintintegrator.h>
 #include <iostream>
 #include <fstream>
-#include <numeric>
+#include <vector>
 #include <unistd.h>
 #include <sys/types.h>
 #include <pwd.h>
@@ -32,6 +34,21 @@ public:
       real sum = 0;
       for (auto n : v) sum += n;
       return sum;
+    }
+};
+
+class TestFunctionInterceptable : public InterceptableIntegrand
+{
+public:
+    TestFunctionInterceptable(int s) : InterceptableIntegrand(s) {}
+    virtual ~TestFunctionInterceptable() {}
+    virtual InterceptedValue intercept(const real *x)
+    {
+        vector<real> v(x, x + this->getDimension());
+        real sum = 0;
+        for (auto n : v) sum += n;
+        InterceptedValue res {sum, v};
+        return res;
     }
 };
 
@@ -77,6 +94,15 @@ void calculateIntegral(TestFunction& f, Integrator& integrator)
               << "Result: " << (result == Integrator::Status::MAX_EVAL_REACHED ? "OK" : "Not OK") << "\n";
 }
 
+void calculateIntegral(TestFunctionInterceptable& f, Integrator& integrator)
+{
+    Hypercube h(f.getDimension());
+    EstErr ee;
+    auto result = integrator.integrate(f, h, 10, 0, 0, ee);
+    std::cout << "QINT Estimate: " << ee.getEstimate() << "(+/-)" << ee.getError() << " "
+              << "QINT Result: " << (result == Integrator::Status::MAX_EVAL_REACHED ? "OK" : "Not OK") << "\n";
+}
+
 void calculateIntegral(SequenceInterceptor& si, Integrator& integrator)
 {
     Hypercube h(si.getDimension());
@@ -92,23 +118,22 @@ int main()
     int seed=42;
     TestFunction f(s);
     SequenceInterceptor si(s);
+    TestFunctionInterceptable fi(s);
 
     MonteCarloPointSet<MersenneTwister> ps_mc;
     MCIntegrator integrator_mc(&ps_mc);
     integrator_mc.randomize(seed);
     integrator_mc.setMinNumEval(300);
 
-    NiederreiterMatrix matrix_nied;
-    DigitalNet2PointSet<real> ps_nied(matrix_nied, true, DigitalNet::CENTER);
-    RQMCIntegrator integrator_nied(&ps_nied, rc, seed);
-
     SobolMatrix matrix_sobol;
     DigitalSeq2PointSet<real> ps_sobol(matrix_sobol, true);
     RQMCIntegrator integrator_sobol(&ps_sobol, rc, seed);
+    QINTIntegrator integrator_sobol_qint(&ps_sobol, rc, seed);
 
     //calculateIntegral(si, integrator_sobol);
     //calculateIntegral(f, integrator_mc);
     calculateIntegral(f, integrator_sobol);
     //calculateIntegral(f, integrator_nied);
+    calculateIntegral(fi, integrator_sobol_qint);
 
 }

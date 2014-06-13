@@ -1,16 +1,9 @@
-#include "rqmcintegrator.h"
+#include "qintintegrator.h"
 #include <vector>
 #include <cmath>
 
-double sum(std::vector<double> v)
-{
-    double sum = 0;
-    for (double n : v) sum += n;
-    return sum;
-}
-
-Integrator::Status RQMCIntegrator::integrate(
-        Integrand &f,
+Integrator::Status QINTIntegrator::integrateAndIntercept(
+        InterceptableIntegrand &f,
         const Hypercube &h,
         Index n, real, real,
         EstErr &ee)
@@ -39,18 +32,30 @@ Integrator::Status RQMCIntegrator::integrate(
         Point point(h.getDimension());
         int seed = e();
         ps->randomize(seed);
+        f.eraseInterceptedPoints();
+        f.reserveInterceptedPoints(m);
         ps->integrate(point, f, m, s);
+        auto inter = f.getInterceptedPoints();
         stats[i] = s;
     }
 
     std::vector<double> estimates;
     estimates.reserve(randCount);
-    std::vector<double> sqdiffs;
-    sqdiffs.reserve(randCount);
+    std::vector<double> variances;
+    variances.reserve(randCount);
     for (auto x : stats) estimates.push_back(x.getMean() * h.getVolume());
-    double rqmcEst = sum(estimates) / randCount;
-    for (auto x : estimates) sqdiffs.push_back(std::pow(rqmcEst - x, 2));
-    double rqmcStdError = std::sqrt(sum(sqdiffs) / randCount / (randCount - 1));
-    ee.set(rqmcEst, rqmcStdError);
+    double qintEst = 0;//sum(estimates) / randCount;
+    //variances =
+    //double qintStdError = std::sqrt(sum(sqdiffs) / randCount / (randCount - 1));
+    ee.set(qintEst, 0);
     return MAX_EVAL_REACHED;
+}
+
+Integrator::Status QINTIntegrator::integrate(
+        Integrand &,
+        const Hypercube &,
+        Index, real, real,
+        EstErr &)
+{
+    return ERROR;
 }

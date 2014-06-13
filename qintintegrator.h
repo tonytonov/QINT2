@@ -1,5 +1,5 @@
-#ifndef RQMCINTEGRATOR_H
-#define RQMCINTEGRATOR_H
+#ifndef QINTINTEGRATOR_H
+#define QINTINTEGRATOR_H
 
 #include <HIntLib/qmcintegrator.h>
 #include <HIntLib/integrand.h>
@@ -7,15 +7,19 @@
 #include <HIntLib/defaults.h>
 #include <HIntLib/hypercube.h>
 #include <HIntLib/digitalnet2.h>
+#include <interceptableintegrand.h>
 
 using namespace HIntLib;
 
-class RQMCIntegrator : public Integrator
+class QINTIntegrator : public Integrator
 {
 public:
-    RQMCIntegrator(Digital2PointSet* _ps, unsigned int _rn = 10, unsigned int _gs = 1)
+    QINTIntegrator(Digital2PointSet* _ps, unsigned int _rn = 10, unsigned int _gs = 1)
         : ps(_ps), randCount(_rn), globalSeed(_gs) {}
 
+    Status integrateAndIntercept(
+          InterceptableIntegrand &, const Hypercube &, Index maxEval,
+          real reqAbsError, real reqRelError, EstErr &ee);
     virtual
     Status integrate(
           Integrand &, const Hypercube &, Index maxEval,
@@ -26,4 +30,4 @@ private:
     unsigned int globalSeed;
 };
 
-#endif // RQMCINTEGRATOR_H
+#endif // QINTINTEGRATOR_H
