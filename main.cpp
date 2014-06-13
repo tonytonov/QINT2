@@ -30,7 +30,7 @@ public:
     {
       vector<real> v(x, x + this->getDimension());
       real sum = 0;
-      for (real n : v) sum += n;
+      for (auto n : v) sum += n;
       return sum;
     }
 };
@@ -56,7 +56,7 @@ public:
     {
         vector<real> v(x, x + this->getDimension());
         string s;
-        for (real n : v)
+        for (auto n : v)
         {
             s += to_string(n);
             s += ", ";
@@ -72,8 +72,8 @@ void calculateIntegral(TestFunction& f, Integrator& integrator)
 {
     Hypercube h(f.getDimension());
     EstErr ee;
-    auto result = integrator.integrate(f, h, 100000, 0, 0, ee);
-    std::cout << "Estimate: " << ee.getEstimate() << "+-" << ee.getError() << " "
+    auto result = integrator.integrate(f, h, 10, 0, 0, ee);
+    std::cout << "Estimate: " << ee.getEstimate() << "(+/-)" << ee.getError() << " "
               << "Result: " << (result == Integrator::Status::MAX_EVAL_REACHED ? "OK" : "Not OK") << "\n";
 }
 
@@ -94,7 +94,6 @@ int main()
     SequenceInterceptor si(s);
 
     MonteCarloPointSet<MersenneTwister> ps_mc;
-    //ps_mc.randomize(seed);
     MCIntegrator integrator_mc(&ps_mc);
     integrator_mc.randomize(seed);
     integrator_mc.setMinNumEval(300);
@@ -107,9 +106,9 @@ int main()
     DigitalSeq2PointSet<real> ps_sobol(matrix_sobol, true);
     RQMCIntegrator integrator_sobol(&ps_sobol, rc, seed);
 
-    calculateIntegral(si, integrator_sobol);
-    calculateIntegral(f, integrator_mc);
+    //calculateIntegral(si, integrator_sobol);
+    //calculateIntegral(f, integrator_mc);
     calculateIntegral(f, integrator_sobol);
-    calculateIntegral(f, integrator_nied);
+    //calculateIntegral(f, integrator_nied);
 
 }
