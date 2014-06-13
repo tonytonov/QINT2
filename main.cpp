@@ -85,30 +85,13 @@ public:
     }
 };
 
-void calculateIntegral(TestFunction& f, Integrator& integrator)
+void calculateIntegral(Integrand& f, Integrator& integrator)
 {
     Hypercube h(f.getDimension());
     EstErr ee;
     auto result = integrator.integrate(f, h, 10, 0, 0, ee);
     std::cout << "Estimate: " << ee.getEstimate() << "(+/-)" << ee.getError() << " "
               << "Result: " << (result == Integrator::Status::MAX_EVAL_REACHED ? "OK" : "Not OK") << "\n";
-}
-
-void calculateIntegral(TestFunctionInterceptable& f, Integrator& integrator)
-{
-    Hypercube h(f.getDimension());
-    EstErr ee;
-    auto result = integrator.integrate(f, h, 10, 0, 0, ee);
-    std::cout << "QINT Estimate: " << ee.getEstimate() << "(+/-)" << ee.getError() << " "
-              << "QINT Result: " << (result == Integrator::Status::MAX_EVAL_REACHED ? "OK" : "Not OK") << "\n";
-}
-
-void calculateIntegral(SequenceInterceptor& si, Integrator& integrator)
-{
-    Hypercube h(si.getDimension());
-    EstErr ee;
-    auto result = integrator.integrate(si, h, 100000, 0, 0, ee);
-    std::cout << "Result: " << (result == Integrator::Status::MAX_EVAL_REACHED ? "OK" : "Not OK") << "\n";
 }
 
 int main()
