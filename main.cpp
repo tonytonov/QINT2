@@ -87,8 +87,8 @@ void calculateIntegral(SequenceInterceptor& si, Integrator& integrator)
 
 int main()
 {
-    int s=5;
-    int rc=10;
+    int s=10;
+    int rc=2;
     int seed=42;
     TestFunction f(s);
     SequenceInterceptor si(s);
@@ -96,6 +96,7 @@ int main()
     MonteCarloPointSet<MersenneTwister> ps_mc;
     //ps_mc.randomize(seed);
     MCIntegrator integrator_mc(&ps_mc);
+    integrator_mc.randomize(seed);
     integrator_mc.setMinNumEval(300);
 
     NiederreiterMatrix matrix_nied;
