@@ -22,7 +22,9 @@ public:
         interceptedPoints.push_back(res.vec);
         return res.value;
     }
-    virtual InterceptedValue intercept (const real []) = 0;
+    virtual InterceptedValue intercept (const real []) {
+        //FIXME
+    }
 
 private:
     std::vector<std::vector<real>> interceptedPoints;

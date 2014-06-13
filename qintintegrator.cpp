@@ -2,8 +2,8 @@
 #include <vector>
 #include <cmath>
 
-Integrator::Status QINTIntegrator::integrateAndIntercept(
-        InterceptableIntegrand &f,
+Integrator::Status QINTIntegrator::integrate(
+        Integrand &f,
         const Hypercube &h,
         Index n, real, real,
         EstErr &ee)
@@ -26,16 +26,25 @@ Integrator::Status QINTIntegrator::integrateAndIntercept(
     std::vector<Statistic<>> stats(randCount);
     std::default_random_engine e(globalSeed);
 
+    std::vector<std::vector<std::vector<double>>> inter;
+    inter.reserve(randCount);
+    auto iif = dynamic_cast<InterceptableIntegrand*>(&f);
     for (unsigned int i = 0; i < randCount; i++)
     {
         Statistic<> s;
         Point point(h.getDimension());
         int seed = e();
         ps->randomize(seed);
-        f.eraseInterceptedPoints();
-        f.reserveInterceptedPoints(m);
+        if (iif)
+        {
+            iif->eraseInterceptedPoints();
+            iif->reserveInterceptedPoints(m);
+        }
         ps->integrate(point, f, m, s);
-        auto inter = f.getInterceptedPoints();
+        if (iif)
+        {
+            inter.push_back(iif->getInterceptedPoints());
+        }
         stats[i] = s;
     }
 
@@ -49,13 +58,4 @@ Integrator::Status QINTIntegrator::integrateAndIntercept(
     //double qintStdError = std::sqrt(sum(sqdiffs) / randCount / (randCount - 1));
     ee.set(qintEst, 0);
     return MAX_EVAL_REACHED;
-}
-
-Integrator::Status QINTIntegrator::integrate(
-        Integrand &,
-        const Hypercube &,
-        Index, real, real,
-        EstErr &)
-{
-    return ERROR;
 }

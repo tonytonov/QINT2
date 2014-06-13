@@ -17,9 +17,6 @@ public:
     QINTIntegrator(Digital2PointSet* _ps, unsigned int _rn = 10, unsigned int _gs = 1)
         : ps(_ps), randCount(_rn), globalSeed(_gs) {}
 
-    Status integrateAndIntercept(
-          InterceptableIntegrand &, const Hypercube &, Index maxEval,
-          real reqAbsError, real reqRelError, EstErr &ee);
     virtual
     Status integrate(
           Integrand &, const Hypercube &, Index maxEval,
