@@ -42,12 +42,12 @@ class TestFunctionInterceptable : public InterceptableIntegrand
 public:
     TestFunctionInterceptable(int s) : InterceptableIntegrand(s) {}
     virtual ~TestFunctionInterceptable() {}
-    virtual InterceptedValue intercept(const real *x)
+    virtual InterceptedSet intercept(const real *x)
     {
         vector<real> v(x, x + this->getDimension());
         real sum = 0;
         for (auto n : v) sum += n;
-        InterceptedValue res {sum, v};
+        InterceptedSet res {sum, v};
         return res;
     }
 };

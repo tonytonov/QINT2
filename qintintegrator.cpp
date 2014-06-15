@@ -26,8 +26,8 @@ Integrator::Status QINTIntegrator::integrate(
     std::vector<Statistic<>> stats(randCount);
     std::default_random_engine e(globalSeed);
 
-    std::vector<std::vector<std::vector<double>>> inter;
-    inter.reserve(randCount);
+    std::vector<std::vector<std::vector<double>>> interceptedSequence;
+    interceptedSequence.reserve(randCount);
     auto iif = dynamic_cast<InterceptableIntegrand*>(&f);
     for (unsigned int i = 0; i < randCount; i++)
     {
@@ -37,13 +37,13 @@ Integrator::Status QINTIntegrator::integrate(
         ps->randomize(seed);
         if (iif)
         {
-            iif->eraseInterceptedPoints();
-            iif->reserveInterceptedPoints(m);
+            iif->eraseIntercepted();
+            iif->reserveIntercepted(m);
         }
         ps->integrate(point, f, m, s);
         if (iif)
         {
-            inter.push_back(iif->getInterceptedPoints());
+            interceptedSequence.push_back(iif->getInterceptedPoints());
         }
         stats[i] = s;
     }
@@ -53,9 +53,10 @@ Integrator::Status QINTIntegrator::integrate(
     std::vector<double> variances;
     variances.reserve(randCount);
     for (auto x : stats) estimates.push_back(x.getMean() * h.getVolume());
-    double qintEst = 0;//sum(estimates) / randCount;
-    //variances =
-    //double qintStdError = std::sqrt(sum(sqdiffs) / randCount / (randCount - 1));
+    double qintEst = sum(estimates) / randCount;
+    //variances = getQintVariances(interceptedSequence, indexSequence);
+    //double qintVar = sum(variances) / randCount / randCount;
+    //double qintStdErr = std::sqrt(qintVar / randCount);
     ee.set(qintEst, 0);
     return MAX_EVAL_REACHED;
 }
