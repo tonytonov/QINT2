@@ -25,6 +25,7 @@ public:
     }
     virtual InterceptedSet intercept (const real []) {
         //FIXME
+        throw "ERROR in InterceptableIntegrand";
     }
 
 private:
@@ -32,7 +33,7 @@ private:
     std::vector<real> interceptedValues;
 public:
     std::vector<std::vector<real>> getInterceptedPoints() { return interceptedPoints; }
-    std::vector<std::vector<real>> getInterceptedValues() { return interceptedValues; }
+    std::vector<real> getInterceptedValues() { return interceptedValues; }
     void eraseIntercepted()
     {
         interceptedPoints.clear();

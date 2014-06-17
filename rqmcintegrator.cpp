@@ -1,13 +1,7 @@
 #include "rqmcintegrator.h"
+#include "utils.h"
 #include <vector>
 #include <cmath>
-
-double sum(std::vector<double> v)
-{
-    double sum = 0;
-    for (double n : v) sum += n;
-    return sum;
-}
 
 Integrator::Status RQMCIntegrator::integrate(
         Integrand &f,

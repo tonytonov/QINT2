@@ -10,7 +10,8 @@ INCLUDEPATH += .
 HEADERS += \
     rqmcintegrator.h \
     qintintegrator.h \
-    interceptableintegrand.h
+    interceptableintegrand.h \
+    utils.h
 SOURCES += main.cpp \
     rqmcintegrator.cpp \
     qintintegrator.cpp

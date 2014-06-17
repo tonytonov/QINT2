@@ -1,4 +1,5 @@
 #include "qintintegrator.h"
+#include "utils.h"
 #include <vector>
 #include <cmath>
 
@@ -26,10 +27,10 @@ Integrator::Status QINTIntegrator::integrate(
     std::vector<Statistic<>> stats(randCount);
     std::default_random_engine e(globalSeed);
 
-    std::vector<std::vector<std::vector<double>>> interceptedSequence;
-    interceptedSequence.reserve(randCount);
+    std::vector<t_sequence> interceptedSequences;
+    interceptedSequences.reserve(randCount);
     auto iif = dynamic_cast<InterceptableIntegrand*>(&f);
-    for (unsigned int i = 0; i < randCount; i++)
+    repeat(randCount, [&]
     {
         Statistic<> s;
         Point point(h.getDimension());
@@ -43,10 +44,10 @@ Integrator::Status QINTIntegrator::integrate(
         ps->integrate(point, f, m, s);
         if (iif)
         {
-            interceptedSequence.push_back(iif->getInterceptedPoints());
+            interceptedSequences.push_back(iif->getInterceptedPoints());
         }
-        stats[i] = s;
-    }
+        stats.push_back(s);
+    });
 
     std::vector<double> estimates;
     estimates.reserve(randCount);
@@ -54,9 +55,43 @@ Integrator::Status QINTIntegrator::integrate(
     variances.reserve(randCount);
     for (auto x : stats) estimates.push_back(x.getMean() * h.getVolume());
     double qintEst = sum(estimates) / randCount;
+    CubicShapeIndexer indexer(2);
+    std::vector<std::vector<int>> indexes;
+    indexes.reserve(randCount);
+    for (auto x : interceptedSequences)
+    {
+        indexes.push_back(indexer.CreateIndex(x));
+    }
     //variances = getQintVariances(interceptedSequence, indexSequence);
     //double qintVar = sum(variances) / randCount / randCount;
     //double qintStdErr = std::sqrt(qintVar / randCount);
     ee.set(qintEst, 0);
     return MAX_EVAL_REACHED;
+}
+
+
+std::vector<int> CubicShapeIndexer::CreateIndex(t_sequence sequence)
+{
+    std::vector<int> res;
+    res.reserve(sequence.size());
+    for (const auto v : sequence)
+    {
+        int d = v.size();
+        std::vector<int> partTimes;
+        partTimes.reserve(d);
+        std::vector<int> binaryIndex;
+        binaryIndex.reserve(d);
+        int index = 0;
+        auto dv = std::div(sParam, d);
+        int a = dv.quot;
+        int b = dv.rem;
+        for (int i = 0; i < d; i++)
+        {
+            (i < b) ? partTimes.push_back(a + 1) : partTimes.push_back(a);
+            binaryIndex.push_back(std::floor(v[i] * std::pow(2, partTimes[i])));
+            index += binaryIndex[i] * std::pow(2, sParam - sum(partTimes));
+        }
+        res.push_back(index);
+    }
+    return res;
 }
