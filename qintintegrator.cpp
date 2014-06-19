@@ -57,6 +57,8 @@ Integrator::Status QintIntegrator::integrate(
     estimates.reserve(randCount);
     std::vector<double> variances;
     variances.reserve(randCount);
+    std::vector<double> mixed_vals;
+    mixed_vals.reserve(n);
     for (const auto x : stats) estimates.push_back(x.getMean() * h.getVolume());
     double qintEst = sum(estimates) / randCount;
     CubicShapeIndexer indexer(sParam);
@@ -67,11 +69,12 @@ Integrator::Status QintIntegrator::integrate(
     {
         auto currentIndex = indexer.CreateIndex(x);
         variances.push_back(estimateQintVariance(interceptedValues[i], currentIndex));
+        mixed_vals.insert(mixed_vals.end(), interceptedValues[i].begin(), interceptedValues[i].end());
         ++i;
     }
-    double qintVar = sum(variances) / randCount / randCount;
     double rqmcStdError = std::sqrt(var(estimates) / randCount);
-    double qintStdError = std::sqrt(qintVar / randCount);
+    double mcStdError = std::sqrt(var(mixed_vals) / n);
+    double qintStdError = std::sqrt(sum(variances) / randCount / randCount);
     ee.set(qintEst, qintStdError);
     return MAX_EVAL_REACHED;
 }
@@ -106,7 +109,7 @@ std::vector<int> CubicShapeIndexer::CreateIndex(t_sequence sequence)
 double QintIntegrator::estimateQintVariance(std::vector<double> values, std::vector<int> index)
 {
     if (values.size() != index.size()) throw ("Sequence and index sizes do not match!");
-    double totalVar = var(values) / values.size();
+    double totalVar = var(values);
     double alphaTerm = 0;
     std::vector<double> alphas(std::pow(2, sParam));
     std::vector<unsigned> alphaCounters(std::pow(2, sParam));
@@ -123,8 +126,8 @@ double QintIntegrator::estimateQintVariance(std::vector<double> values, std::vec
     {
         for (unsigned j=i; j<alphas.size(); j++)
         {
-            alphaTerm += (alphas[i] - alphas[j]) * (alphas[i] - alphas[j]) / values.size();
+            alphaTerm += (alphas[i] - alphas[j]) * (alphas[i] - alphas[j]);
         }
     }
-    return totalVar - alphaTerm;
+    return (totalVar - alphaTerm) / values.size();
 }

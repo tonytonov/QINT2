@@ -99,7 +99,7 @@ int main()
 {
     int s=5;
     int rc=20;
-    int sparam=5;
+    int sparam=10;
     int seed=42;
     TestFunction f(s);
     SequenceInterceptor si(s);
