@@ -19,6 +19,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <pwd.h>
+#include <utils.h>
 
 using namespace HIntLib;
 using namespace std;
@@ -89,16 +90,16 @@ void calculateIntegral(Integrand& f, Integrator& integrator)
 {
     Hypercube h(f.getDimension());
     EstErr ee;
-    auto result = integrator.integrate(f, h, 100, 0, 0, ee);
+    auto result = integrator.integrate(f, h, 10000, 0, 0, ee);
     std::cout << "Estimate: " << ee.getEstimate() << "(+/-)" << ee.getError() << " "
               << "Result: " << (result == Integrator::Status::MAX_EVAL_REACHED ? "OK" : "Not OK") << "\n";
 }
 
 int main()
 {
-    int s=3;
-    int rc=2;
-    int sparam=1;
+    int s=5;
+    int rc=20;
+    int sparam=5;
     int seed=42;
     TestFunction f(s);
     SequenceInterceptor si(s);
@@ -115,9 +116,8 @@ int main()
     QintIntegrator integrator_sobol_qint(&ps_sobol, rc, sparam, seed);
 
     //calculateIntegral(si, integrator_sobol);
-    //calculateIntegral(f, integrator_mc);
+    calculateIntegral(f, integrator_mc);
     calculateIntegral(f, integrator_sobol);
     //calculateIntegral(f, integrator_nied);
     calculateIntegral(fi, integrator_sobol_qint);
-
 }

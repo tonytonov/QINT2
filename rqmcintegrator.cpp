@@ -39,12 +39,9 @@ Integrator::Status RQMCIntegrator::integrate(
 
     std::vector<double> estimates;
     estimates.reserve(randCount);
-    std::vector<double> sqdiffs;
-    sqdiffs.reserve(randCount);
     for (auto x : stats) estimates.push_back(x.getMean() * h.getVolume());
     double rqmcEst = sum(estimates) / randCount;
-    for (auto x : estimates) sqdiffs.push_back(std::pow(rqmcEst - x, 2));
-    double rqmcStdError = std::sqrt(sum(sqdiffs) / randCount / (randCount - 1));
+    double rqmcStdError = std::sqrt(var(estimates) / randCount);
     ee.set(rqmcEst, rqmcStdError);
     return MAX_EVAL_REACHED;
 }

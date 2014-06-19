@@ -27,7 +27,8 @@ std::vector<T> square(const std::vector<T> v)
 template<typename T>
 T var(const std::vector<T> v)
 {
-    return (sum(square(v)) - v.size() * mean(v) * mean(v)) / (v.size() - 1);
+    T m = mean(v);
+    return (sum(square(v)) - v.size() * m * m) / (v.size() - 1);
 }
 
 template<typename F>

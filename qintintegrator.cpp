@@ -70,8 +70,9 @@ Integrator::Status QintIntegrator::integrate(
         ++i;
     }
     double qintVar = sum(variances) / randCount / randCount;
-    double qintStdErr = std::sqrt(qintVar / randCount);
-    ee.set(qintEst, qintStdErr);
+    double rqmcStdError = std::sqrt(var(estimates) / randCount);
+    double qintStdError = std::sqrt(qintVar / randCount);
+    ee.set(qintEst, qintStdError);
     return MAX_EVAL_REACHED;
 }
 
@@ -105,7 +106,7 @@ std::vector<int> CubicShapeIndexer::CreateIndex(t_sequence sequence)
 double QintIntegrator::estimateQintVariance(std::vector<double> values, std::vector<int> index)
 {
     if (values.size() != index.size()) throw ("Sequence and index sizes do not match!");
-    double totalVar = var(values);
+    double totalVar = var(values) / values.size();
     double alphaTerm = 0;
     std::vector<double> alphas(std::pow(2, sParam));
     std::vector<unsigned> alphaCounters(std::pow(2, sParam));
