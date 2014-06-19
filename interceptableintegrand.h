@@ -23,10 +23,7 @@ public:
         interceptedValues.push_back(res.value);
         return res.value;
     }
-    virtual InterceptedSet intercept (const real []) {
-        //FIXME
-        throw "ERROR in InterceptableIntegrand";
-    }
+    virtual InterceptedSet intercept (const real []) = 0;
 
 private:
     std::vector<std::vector<real>> interceptedPoints;

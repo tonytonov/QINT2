@@ -3,7 +3,7 @@
 #include <vector>
 #include <cmath>
 
-Integrator::Status QINTIntegrator::integrate(
+Integrator::Status QintIntegrator::integrate(
         Integrand &f,
         const Hypercube &h,
         Index n, real, real,
@@ -24,11 +24,14 @@ Integrator::Status QINTIntegrator::integrate(
     if (randCount == 0) return ERROR;
     int m = n / randCount;
 
-    std::vector<Statistic<>> stats(randCount);
+    std::vector<Statistic<>> stats;
+    stats.reserve(randCount);
     std::default_random_engine e(globalSeed);
 
     std::vector<t_sequence> interceptedSequences;
     interceptedSequences.reserve(randCount);
+    std::vector<std::vector<real>> interceptedValues;
+    interceptedValues.reserve(randCount);
     auto iif = dynamic_cast<InterceptableIntegrand*>(&f);
     repeat(randCount, [&]
     {
@@ -45,6 +48,7 @@ Integrator::Status QINTIntegrator::integrate(
         if (iif)
         {
             interceptedSequences.push_back(iif->getInterceptedPoints());
+            interceptedValues.push_back(iif->getInterceptedValues());
         }
         stats.push_back(s);
     });
@@ -53,19 +57,21 @@ Integrator::Status QINTIntegrator::integrate(
     estimates.reserve(randCount);
     std::vector<double> variances;
     variances.reserve(randCount);
-    for (auto x : stats) estimates.push_back(x.getMean() * h.getVolume());
+    for (const auto x : stats) estimates.push_back(x.getMean() * h.getVolume());
     double qintEst = sum(estimates) / randCount;
-    CubicShapeIndexer indexer(2);
+    CubicShapeIndexer indexer(sParam);
     std::vector<std::vector<int>> indexes;
     indexes.reserve(randCount);
-    for (auto x : interceptedSequences)
+    unsigned i=0;
+    for (const auto x : interceptedSequences)
     {
-        indexes.push_back(indexer.CreateIndex(x));
+        auto currentIndex = indexer.CreateIndex(x);
+        variances.push_back(estimateQintVariance(interceptedValues[i], currentIndex));
+        ++i;
     }
-    //variances = getQintVariances(interceptedSequence, indexSequence);
-    //double qintVar = sum(variances) / randCount / randCount;
-    //double qintStdErr = std::sqrt(qintVar / randCount);
-    ee.set(qintEst, 0);
+    double qintVar = sum(variances) / randCount / randCount;
+    double qintStdErr = std::sqrt(qintVar / randCount);
+    ee.set(qintEst, qintStdErr);
     return MAX_EVAL_REACHED;
 }
 
@@ -94,4 +100,30 @@ std::vector<int> CubicShapeIndexer::CreateIndex(t_sequence sequence)
         res.push_back(index);
     }
     return res;
+}
+
+double QintIntegrator::estimateQintVariance(std::vector<double> values, std::vector<int> index)
+{
+    if (values.size() != index.size()) throw ("Sequence and index sizes do not match!");
+    double totalVar = var(values);
+    double alphaTerm = 0;
+    std::vector<double> alphas(std::pow(2, sParam));
+    std::vector<unsigned> alphaCounters(std::pow(2, sParam));
+    for (unsigned i=0; i<values.size(); i++)
+    {
+        alphas[index[i]] += values[i];
+        ++alphaCounters[index[i]];
+    }
+    for (unsigned j=0; j<alphas.size(); j++)
+    {
+        alphas[j] = alphas[j] / alphaCounters[j] / std::pow(2, sParam);
+    }
+    for (unsigned i=0; i<alphas.size(); i++)
+    {
+        for (unsigned j=i; j<alphas.size(); j++)
+        {
+            alphaTerm += (alphas[i] - alphas[j]) * (alphas[i] - alphas[j]) / values.size();
+        }
+    }
+    return totalVar - alphaTerm;
 }

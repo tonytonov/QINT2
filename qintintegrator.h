@@ -13,10 +13,10 @@
 using namespace HIntLib;
 typedef std::vector<std::vector<double>> t_sequence;
 
-class QINTIntegrator : public Integrator
+class QintIntegrator : public Integrator
 {
 public:
-    QINTIntegrator(Digital2PointSet* _ps,
+    QintIntegrator(Digital2PointSet* _ps,
                    unsigned _rn = 10,
                    unsigned _sp = 1,
                    unsigned _gs = 1)
@@ -31,6 +31,7 @@ private:
     unsigned randCount;
     unsigned sParam;
     unsigned globalSeed;
+    double estimateQintVariance(std::vector<double> values, std::vector<int> index);
 };
 
 class QINTPartitionIndexer

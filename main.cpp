@@ -96,8 +96,9 @@ void calculateIntegral(Integrand& f, Integrator& integrator)
 
 int main()
 {
-    int s=10;
+    int s=3;
     int rc=2;
+    int sparam=1;
     int seed=42;
     TestFunction f(s);
     SequenceInterceptor si(s);
@@ -111,7 +112,7 @@ int main()
     SobolMatrix matrix_sobol;
     DigitalSeq2PointSet<real> ps_sobol(matrix_sobol, true);
     RQMCIntegrator integrator_sobol(&ps_sobol, rc, seed);
-    QINTIntegrator integrator_sobol_qint(&ps_sobol, rc, seed);
+    QintIntegrator integrator_sobol_qint(&ps_sobol, rc, sparam, seed);
 
     //calculateIntegral(si, integrator_sobol);
     //calculateIntegral(f, integrator_mc);
