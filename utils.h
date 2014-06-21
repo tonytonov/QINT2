@@ -1,6 +1,15 @@
 #ifndef UTILS_H
 #define UTILS_H
 
+#include <vector>
+#include <string>
+
+template<typename T>
+std::string S(T t)
+{
+    return std::to_string(t);
+}
+
 template<typename T>
 T sum(const std::vector<T> v)
 {

@@ -18,14 +18,16 @@ public:
 class FI00_simpleSum : public InterceptableIntegrand
 {
 public:
-    FI00_simpleSum(int s) : InterceptableIntegrand(s, (double) s / 2) {}
+    FI00_simpleSum(int s) : InterceptableIntegrand(s, (double) s / 2)
+    { name = "Simple sum"; }
     virtual InterceptedSet intercept(const real *);
 };
 
 class FI01_fMorCaf : public InterceptableIntegrand
 {
 public:
-    FI01_fMorCaf(int s) : InterceptableIntegrand(s, 1.0) {}
+    FI01_fMorCaf(int s) : InterceptableIntegrand(s, 1.0)
+    { name = "Morokoff-Caflisch function #1";}
     virtual InterceptedSet intercept(const real *);
 };
 

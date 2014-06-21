@@ -32,6 +32,7 @@ private:
     std::vector<real> interceptedValues;
     real exactValue;
 public:
+    std::string name = "Unknown function";
     std::vector<std::vector<real>> getInterceptedPoints() { return interceptedPoints; }
     std::vector<real> getInterceptedValues() { return interceptedValues; }
     void eraseIntercepted()

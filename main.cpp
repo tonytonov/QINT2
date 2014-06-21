@@ -79,8 +79,8 @@ void writeMethodComparison(InterceptableIntegrand& f, std::vector<Integrator*>& 
     sqlite3 *db;
     //TODO : do smth with file locations and rc
     int rc = sqlite3_open("../qint.sqlite", &db);
-    char* createDBQuery = R"sql(
-            CREATE TABLE IF NOT EXISTS results(
+    std::string createDBQuery =
+            R"sql(CREATE TABLE IF NOT EXISTS results(
             function TEXT NOT NULL,
             dim INT NOT NULL,
             exactval REAL,
@@ -93,25 +93,30 @@ void writeMethodComparison(InterceptableIntegrand& f, std::vector<Integrator*>& 
             sparam INT,
             seed INT NOT NULL)
             )sql";
-
     for (const auto integrator : integratorList)
     {
         auto status = integrator->integrate(f, h, maxEval, 0, 0, ee);
-        char* addResultsQuery = R"sql(
-                INSERT INTO results(
-                function, dim, exactval, method,
-                maxeval, status, estimate, stddev,
-                randcount, sparam, seed) VALUES
-                (
-                    'test', 99, 0.1, 'somemethod',
-                    999, 1, 42, 24,
-                    333, 2, 911
-                )
-                )sql";
-        sqlite3_exec(db, addResultsQuery, 0, 0, 0);
+        std::string addResultsQuery =
+                "INSERT INTO results("
+                "function, dim, exactval, method, "
+                "maxeval, status, estimate, stddev, "
+                "randcount, sparam, seed) VALUES"
+                "("
+                "\'" + f.name + "\'," +
+                S(f.getDimension()) + "," +
+                S(f.getExactValue()) + "," +
+                "\'" + "NA" + "\'," +
+                S(maxEval) + "," +
+                S(status == Integrator::Status::MAX_EVAL_REACHED) + "," +
+                S(ee.getEstimate()) + "," +
+                S(ee.getError()) + "," +
+                S(0) + "," +
+                S(0) + "," +
+                S(0) + ")";
+        sqlite3_exec(db, addResultsQuery.c_str(), 0, 0, 0);
     }
 
-    sqlite3_exec(db, createDBQuery, 0, 0, 0);
+    sqlite3_exec(db, createDBQuery.c_str(), 0, 0, 0);
     if (db)
     {
       sqlite3_close(db);
