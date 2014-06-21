@@ -72,13 +72,14 @@ void runMethodComparison(InterceptableIntegrand& f, std::vector<Integrator*>& in
     }
 }
 
-void writeMethodComparison(InterceptableIntegrand& f, std::vector<Integrator*>& integratorList, int maxEval)
+void writeMethodComparison(InterceptableIntegrand& f, std::vector<Integrator*>& integratorList,
+                           int maxEval, int randCount, int sParamQint, int seed)
 {
     Hypercube h(f.getDimension());
     EstErr ee;
     sqlite3 *db;
     //TODO : do smth with file locations and rc
-    int rc = sqlite3_open("../qint.sqlite", &db);
+    int dbStatus = sqlite3_open("../qint.sqlite", &db);
     std::string createDBQuery =
             R"sql(CREATE TABLE IF NOT EXISTS results(
             function TEXT NOT NULL,
@@ -96,6 +97,24 @@ void writeMethodComparison(InterceptableIntegrand& f, std::vector<Integrator*>& 
     for (const auto integrator : integratorList)
     {
         auto status = integrator->integrate(f, h, maxEval, 0, 0, ee);
+        std::string methodName = "Undefined method";
+        int rc = -1;
+        int sparam = -1;
+        if (dynamic_cast<MCIntegrator*>(integrator))
+        {
+            methodName = "MC";
+        }
+        if (dynamic_cast<RQMCIntegrator*>(integrator))
+        {
+            methodName = "RQMC";
+            rc = randCount;
+        }
+        if (dynamic_cast<QintIntegrator*>(integrator))
+        {
+            methodName = "Qint";
+            rc = randCount;
+            sparam = sParamQint;
+        }
         std::string addResultsQuery =
                 "INSERT INTO results("
                 "function, dim, exactval, method, "
@@ -105,14 +124,14 @@ void writeMethodComparison(InterceptableIntegrand& f, std::vector<Integrator*>& 
                 "\'" + f.name + "\'," +
                 S(f.getDimension()) + "," +
                 S(f.getExactValue()) + "," +
-                "\'" + "NA" + "\'," +
+                "\'" + methodName + "\'," +
                 S(maxEval) + "," +
                 S(status == Integrator::Status::MAX_EVAL_REACHED) + "," +
                 S(ee.getEstimate()) + "," +
                 S(ee.getError()) + "," +
-                S(0) + "," +
-                S(0) + "," +
-                S(0) + ")";
+                S(rc) + "," +
+                S(sparam) + "," +
+                S(seed) + ")";
         sqlite3_exec(db, addResultsQuery.c_str(), 0, 0, 0);
     }
 
@@ -126,10 +145,10 @@ void writeMethodComparison(InterceptableIntegrand& f, std::vector<Integrator*>& 
 int main()
 {
     int s=5;
-    int rc=20;
-    int sparam=8;
+    int rc=16;
+    int sparam=0;
     int seed=42;
-    int maxEval=10000;
+    int maxEval=std::pow(2, 13);
 
     //FI00_simpleSum f(s);
     FI01_fMorCaf f(s);
@@ -148,5 +167,5 @@ int main()
         &integrator_mc, &integrator_sobol, &integrator_sobol_qint
     };
     //runMethodComparison(f, integratorList, maxEval);
-    writeMethodComparison(f, integratorList, maxEval);
+    writeMethodComparison(f, integratorList, maxEval, rc, sparam, seed);
 }
