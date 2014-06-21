@@ -20,6 +20,7 @@
 #include <sys/types.h>
 #include <pwd.h>
 #include <utils.h>
+#include <sqlite3.h>
 #include <testcollection.h>
 
 using namespace HIntLib;
@@ -63,11 +64,57 @@ void runMethodComparison(InterceptableIntegrand& f, std::vector<Integrator*>& in
     Hypercube h(f.getDimension());
     EstErr ee;
     std::cout << "Integral: " << f.getDimension() << " dimensions, " << "exact value " << f.getExactValue() << "\n";
-    for (auto integrator : integratorList)
+    for (const auto integrator : integratorList)
     {
         auto status = integrator->integrate(f, h, maxEval, 0, 0, ee);
         std::cout << "Estimate: " << ee.getEstimate() << "(+/-)" << ee.getError() << "; "
                   << "Result: " << (status == Integrator::Status::MAX_EVAL_REACHED ? "OK" : "Not OK") << "\n";
+    }
+}
+
+void writeMethodComparison(InterceptableIntegrand& f, std::vector<Integrator*>& integratorList, int maxEval)
+{
+    Hypercube h(f.getDimension());
+    EstErr ee;
+    sqlite3 *db;
+    //TODO : do smth with file locations and rc
+    int rc = sqlite3_open("../qint.sqlite", &db);
+    char* createDBQuery = R"sql(
+            CREATE TABLE IF NOT EXISTS results(
+            function TEXT NOT NULL,
+            dim INT NOT NULL,
+            exactval REAL,
+            method TEXT NOT NULL,
+            maxeval INT NOT NULL,
+            status BOOLEAN NOT NULL,
+            estimate REAL NOT NULL,
+            stddev REAL NOT NULL,
+            randcount INT,
+            sparam INT,
+            seed INT NOT NULL)
+            )sql";
+
+    for (const auto integrator : integratorList)
+    {
+        auto status = integrator->integrate(f, h, maxEval, 0, 0, ee);
+        char* addResultsQuery = R"sql(
+                INSERT INTO results(
+                function, dim, exactval, method,
+                maxeval, status, estimate, stddev,
+                randcount, sparam, seed) VALUES
+                (
+                    'test', 99, 0.1, 'somemethod',
+                    999, 1, 42, 24,
+                    333, 2, 911
+                )
+                )sql";
+        sqlite3_exec(db, addResultsQuery, 0, 0, 0);
+    }
+
+    sqlite3_exec(db, createDBQuery, 0, 0, 0);
+    if (db)
+    {
+      sqlite3_close(db);
     }
 }
 
@@ -95,5 +142,6 @@ int main()
     {
         &integrator_mc, &integrator_sobol, &integrator_sobol_qint
     };
-    runMethodComparison(f, integratorList, maxEval);
+    //runMethodComparison(f, integratorList, maxEval);
+    writeMethodComparison(f, integratorList, maxEval);
 }

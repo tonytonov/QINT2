@@ -20,4 +20,5 @@ SOURCES += main.cpp \
 
 QMAKE_CXXFLAGS += -std=c++0x
 
-LIBS += -L/usr/ -lhintlib
+LIBS += -L/usr/ -lhintlib \
+        -lsqlite3

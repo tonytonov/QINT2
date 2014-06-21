@@ -20,7 +20,7 @@ InterceptedSet FI01_fMorCaf::intercept(const real *x)
     int d = this->getDimension();
     std::vector<real> v(x, x + d);
     real f = 1;
-    for (auto x : v) f *= (1 + 1.0 / d) * std::pow(x, 1.0 / d);
+    for (const auto x : v) f *= (1 + 1.0 / d) * std::pow(x, 1.0 / d);
     InterceptedSet res {f, v};
     return res;
 }
