@@ -58,38 +58,42 @@ public:
     }
 };
 
-void calculateIntegral(Integrand& f, Integrator& integrator)
+void runMethodComparison(InterceptableIntegrand& f, std::vector<Integrator*>& integratorList, int maxEval)
 {
     Hypercube h(f.getDimension());
     EstErr ee;
-    auto result = integrator.integrate(f, h, 10000, 0, 0, ee);
-    std::cout << "Estimate: " << ee.getEstimate() << "(+/-)" << ee.getError() << " "
-              << "Result: " << (result == Integrator::Status::MAX_EVAL_REACHED ? "OK" : "Not OK") << "\n";
+    std::cout << "Integral: " << f.getDimension() << " dimensions, " << "exact value " << f.getExactValue() << "\n";
+    for (auto integrator : integratorList)
+    {
+        auto status = integrator->integrate(f, h, maxEval, 0, 0, ee);
+        std::cout << "Estimate: " << ee.getEstimate() << "(+/-)" << ee.getError() << "; "
+                  << "Result: " << (status == Integrator::Status::MAX_EVAL_REACHED ? "OK" : "Not OK") << "\n";
+    }
 }
 
 int main()
 {
     int s=5;
     int rc=20;
-    int sparam=10;
+    int sparam=8;
     int seed=42;
-    TestFunction f(s);
-    SequenceInterceptor si(s);
-    TestFunctionInterceptable fi(s);
+    int maxEval=10000;
+
+    //FI00_simpleSum f(s);
+    FI01_fMorCaf f(s);
 
     MonteCarloPointSet<MersenneTwister> ps_mc;
     MCIntegrator integrator_mc(&ps_mc);
     integrator_mc.randomize(seed);
-    integrator_mc.setMinNumEval(300);
 
     SobolMatrix matrix_sobol;
     DigitalSeq2PointSet<real> ps_sobol(matrix_sobol, true);
     RQMCIntegrator integrator_sobol(&ps_sobol, rc, seed);
     QintIntegrator integrator_sobol_qint(&ps_sobol, rc, sparam, seed);
 
-    //calculateIntegral(si, integrator_sobol);
-    calculateIntegral(f, integrator_mc);
-    calculateIntegral(f, integrator_sobol);
-    //calculateIntegral(f, integrator_nied);
-    calculateIntegral(fi, integrator_sobol_qint);
+    std::vector<Integrator*> integratorList
+    {
+        &integrator_mc, &integrator_sobol, &integrator_sobol_qint
+    };
+    runMethodComparison(f, integratorList, maxEval);
 }

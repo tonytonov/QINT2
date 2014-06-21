@@ -4,6 +4,8 @@
 #include <HIntLib/defaults.h>
 #include <HIntLib/integrand.h>
 #include <vector>
+#include <limits>
+#include <cmath>
 
 using namespace HIntLib;
 
@@ -15,7 +17,7 @@ struct InterceptedSet {
 class InterceptableIntegrand : public Integrand
 {
 public:
-    InterceptableIntegrand (int s): Integrand(s) {}
+    InterceptableIntegrand (int s, real exactValue = std::numeric_limits<double>::quiet_NaN()): Integrand(s), exactValue(exactValue) {}
     virtual ~InterceptableIntegrand() {}
     virtual real operator() (const real* x) {
         auto res = intercept(x);
@@ -28,6 +30,7 @@ public:
 private:
     std::vector<std::vector<real>> interceptedPoints;
     std::vector<real> interceptedValues;
+    real exactValue;
 public:
     std::vector<std::vector<real>> getInterceptedPoints() { return interceptedPoints; }
     std::vector<real> getInterceptedValues() { return interceptedValues; }
@@ -41,6 +44,7 @@ public:
         interceptedPoints.reserve(n);
         interceptedValues.reserve(n);
     }
+    real getExactValue() { return exactValue; }
 };
 
 #endif // INTERCEPTABLEINTEGRAND_H

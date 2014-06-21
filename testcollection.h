@@ -8,19 +8,24 @@
 #include <HIntLib/defaults.h>
 #include <interceptableintegrand.h>
 
-class TestFunction : public Integrand
+class F00_simpleSum : public Integrand
 {
 public:
-    TestFunction(int s) : Integrand(s) {}
-    virtual ~TestFunction() {}
+    F00_simpleSum(int s) : Integrand(s) {}
     virtual real operator() (const real *);
 };
 
-class TestFunctionInterceptable : public InterceptableIntegrand
+class FI00_simpleSum : public InterceptableIntegrand
 {
 public:
-    TestFunctionInterceptable(int s) : InterceptableIntegrand(s) {}
-    virtual ~TestFunctionInterceptable() {}
+    FI00_simpleSum(int s) : InterceptableIntegrand(s, (double) s / 2) {}
+    virtual InterceptedSet intercept(const real *);
+};
+
+class FI01_fMorCaf : public InterceptableIntegrand
+{
+public:
+    FI01_fMorCaf(int s) : InterceptableIntegrand(s, 1.0) {}
     virtual InterceptedSet intercept(const real *);
 };
 
