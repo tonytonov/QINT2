@@ -1,5 +1,5 @@
-#include "qintintegrator.h"
-#include "utils.h"
+#include <qintintegrator.h>
+#include <utils.h>
 #include <vector>
 #include <cmath>
 

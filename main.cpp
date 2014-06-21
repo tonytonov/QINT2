@@ -20,38 +20,10 @@
 #include <sys/types.h>
 #include <pwd.h>
 #include <utils.h>
+#include <testcollection.h>
 
 using namespace HIntLib;
 using namespace std;
-
-class TestFunction : public Integrand
-{
-public:
-    TestFunction(int s) : Integrand(s) {}
-    virtual ~TestFunction() {}
-    virtual real operator() (const real *x)
-    {
-      vector<real> v(x, x + this->getDimension());
-      real sum = 0;
-      for (auto n : v) sum += n;
-      return sum;
-    }
-};
-
-class TestFunctionInterceptable : public InterceptableIntegrand
-{
-public:
-    TestFunctionInterceptable(int s) : InterceptableIntegrand(s) {}
-    virtual ~TestFunctionInterceptable() {}
-    virtual InterceptedSet intercept(const real *x)
-    {
-        vector<real> v(x, x + this->getDimension());
-        real sum = 0;
-        for (auto n : v) sum += n;
-        InterceptedSet res {sum, v};
-        return res;
-    }
-};
 
 class SequenceInterceptor : public Integrand
 {

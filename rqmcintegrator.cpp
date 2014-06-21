@@ -1,5 +1,5 @@
-#include "rqmcintegrator.h"
-#include "utils.h"
+#include <rqmcintegrator.h>
+#include <utils.h>
 #include <vector>
 #include <cmath>
 

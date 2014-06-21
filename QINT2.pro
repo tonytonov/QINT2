@@ -11,10 +11,12 @@ HEADERS += \
     rqmcintegrator.h \
     qintintegrator.h \
     interceptableintegrand.h \
-    utils.h
+    utils.h \
+    testcollection.h
 SOURCES += main.cpp \
     rqmcintegrator.cpp \
-    qintintegrator.cpp
+    qintintegrator.cpp \
+    testcollection.cpp
 
 QMAKE_CXXFLAGS += -std=c++0x
 
