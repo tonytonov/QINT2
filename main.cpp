@@ -82,6 +82,7 @@ void writeMethodComparison(InterceptableIntegrand& f, std::vector<Integrator*>& 
     int dbStatus = sqlite3_open("../qint.sqlite", &db);
     std::string createDBQuery =
             R"sql(CREATE TABLE IF NOT EXISTS results(
+            hash INT PRIMARY KEY,
             function TEXT NOT NULL,
             dim INT NOT NULL,
             exactval REAL,
@@ -94,6 +95,7 @@ void writeMethodComparison(InterceptableIntegrand& f, std::vector<Integrator*>& 
             sparam INT,
             seed INT NOT NULL)
             )sql";
+    sqlite3_exec(db, createDBQuery.c_str(), 0, 0, 0);
     for (const auto integrator : integratorList)
     {
         auto status = integrator->integrate(f, h, maxEval, 0, 0, ee);
@@ -115,12 +117,7 @@ void writeMethodComparison(InterceptableIntegrand& f, std::vector<Integrator*>& 
             rc = randCount;
             sparam = sParamQint;
         }
-        std::string addResultsQuery =
-                "INSERT INTO results("
-                "function, dim, exactval, method, "
-                "maxeval, status, estimate, stddev, "
-                "randcount, sparam, seed) VALUES"
-                "("
+        std::string exportRecord =
                 "\'" + f.name + "\'," +
                 S(f.getDimension()) + "," +
                 S(f.getExactValue()) + "," +
@@ -131,14 +128,20 @@ void writeMethodComparison(InterceptableIntegrand& f, std::vector<Integrator*>& 
                 S(ee.getError()) + "," +
                 S(rc) + "," +
                 S(sparam) + "," +
-                S(seed) + ")";
+                S(seed);
+        auto hashRecord = std::hash<std::string>()(exportRecord);
+        std::string addResultsQuery =
+                "INSERT INTO results("
+                "hash, function, dim, exactval, "
+                "method, maxeval, status, estimate, "
+                "stddev, randcount, sparam, seed) VALUES"
+                "(" + S(hashRecord) + "," + exportRecord + ")";
         sqlite3_exec(db, addResultsQuery.c_str(), 0, 0, 0);
     }
 
-    sqlite3_exec(db, createDBQuery.c_str(), 0, 0, 0);
     if (db)
     {
-      sqlite3_close(db);
+        sqlite3_close(db);
     }
 }
 
@@ -146,7 +149,7 @@ int main()
 {
     int s=5;
     int rc=16;
-    int sparam=0;
+    int sparam=1;
     int seed=42;
     int maxEval=std::pow(2, 13);
 
