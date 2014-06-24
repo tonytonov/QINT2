@@ -15,12 +15,29 @@ InterceptedSet FI00_simpleSum::intercept(const real *x)
     return res;
 }
 
-InterceptedSet FI01_fMorCaf::intercept(const real *x)
+InterceptedSet FI01_MorCaf1::intercept(const real *x)
 {
     int d = this->getDimension();
     std::vector<real> v(x, x + d);
     real f = 1;
     for (const auto x : v) f *= (1 + 1.0 / d) * std::pow(x, 1.0 / d);
     InterceptedSet res {f, v};
+    return res;
+}
+
+InterceptedSet FI03_PieceLin::intercept(const real *x)
+{
+    int d = this->getDimension();
+    std::vector<real> v(x, x + d);
+    real value = 1.0;
+    real total = 0.0;
+    for (int j = 0; j < d; j++)
+    {
+        if (v[j] <= 0.5 - double(j) / 2 / (j + 10)) {total = 0.0;}
+        else if (v[j] >= 0.5 + double(j) / 2 / (j + 10)) {total = 1.0;}
+        else {total = v[j] * (10 + (double)j) / j - 5.0 / j;}
+        value *= total * 2;
+    }
+    InterceptedSet res {value, v};
     return res;
 }

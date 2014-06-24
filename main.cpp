@@ -24,19 +24,18 @@
 #include <testcollection.h>
 
 using namespace HIntLib;
-using namespace std;
 
 class SequenceInterceptor : public Integrand
 {
 private:
-    ofstream f;
+    std::ofstream f;
 public:
-    SequenceInterceptor(int s, const string filename = string("seq.txt")) :
+    SequenceInterceptor(int s, const std::string filename = std::string("seq.txt")) :
         Integrand(s)
     {
         struct passwd *pw = getpwuid(getuid());
         const char *homedir = pw->pw_dir;
-        string address = string(homedir) + "/" + filename;
+        std::string address = std::string(homedir) + "/" + filename;
         f.open(address);
     }
     virtual ~SequenceInterceptor()
@@ -45,11 +44,11 @@ public:
     }
     virtual real operator() (const real *x)
     {
-        vector<real> v(x, x + this->getDimension());
-        string s;
+        std::vector<real> v(x, x + this->getDimension());
+        std::string s;
         for (auto n : v)
         {
-            s += to_string(n);
+            s += std::to_string(n);
             s += ", ";
         }
         s.pop_back();
@@ -147,28 +146,35 @@ void writeMethodComparison(InterceptableIntegrand& f, std::vector<Integrator*>& 
 
 int main()
 {
-    int s=5;
-    int rc=16;
-    int sparam=1;
+    std::vector<int> s {3, 4, 5, 6, 7, 8, 9, 10};
+    std::vector<int> sparam {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
     int seed=42;
-    int maxEval=std::pow(2, 13);
+    int maxEval=std::pow(2, 14);
+    int rc = 16;
 
-    //FI00_simpleSum f(s);
-    FI01_fMorCaf f(s);
-
-    MonteCarloPointSet<MersenneTwister> ps_mc;
-    MCIntegrator integrator_mc(&ps_mc);
-    integrator_mc.randomize(seed);
-
-    SobolMatrix matrix_sobol;
-    DigitalSeq2PointSet<real> ps_sobol(matrix_sobol, true);
-    RQMCIntegrator integrator_sobol(&ps_sobol, rc, seed);
-    QintIntegrator integrator_sobol_qint(&ps_sobol, rc, sparam, seed);
-
-    std::vector<Integrator*> integratorList
+    for (auto i_s : s)
     {
-        &integrator_mc, &integrator_sobol, &integrator_sobol_qint
-    };
-    //runMethodComparison(f, integratorList, maxEval);
-    writeMethodComparison(f, integratorList, maxEval, rc, sparam, seed);
+        for (auto i_sparam : sparam)
+        {
+            //FI01_MorCaf1 f(i_s);
+            FI03_PieceLin f(i_s);
+
+            MonteCarloPointSet<MersenneTwister> ps_mc;
+            MCIntegrator integrator_mc(&ps_mc);
+            integrator_mc.randomize(seed);
+
+            SobolMatrix matrix_sobol;
+            DigitalSeq2PointSet<real> ps_sobol(matrix_sobol, true);
+            RQMCIntegrator integrator_sobol(&ps_sobol, rc, seed);
+            QintIntegrator integrator_sobol_qint(&ps_sobol, rc, i_sparam, seed);
+
+            std::vector<Integrator*> integratorList
+            {
+                &integrator_mc, &integrator_sobol, &integrator_sobol_qint
+            };
+            std::cout << std::to_string(i_s) << " " << std::flush;
+            //runMethodComparison(f, integratorList, maxEval);
+            writeMethodComparison(f, integratorList, maxEval, rc, i_sparam, seed);
+        }
+    }
 }

@@ -23,11 +23,19 @@ public:
     virtual InterceptedSet intercept(const real *);
 };
 
-class FI01_fMorCaf : public InterceptableIntegrand
+class FI01_MorCaf1 : public InterceptableIntegrand
 {
 public:
-    FI01_fMorCaf(int s) : InterceptableIntegrand(s, 1.0)
+    FI01_MorCaf1(int s) : InterceptableIntegrand(s, 1.0)
     { name = "Morokoff-Caflisch function #1";}
+    virtual InterceptedSet intercept(const real *);
+};
+
+class FI03_PieceLin : public InterceptableIntegrand
+{
+public:
+    FI03_PieceLin(int s) : InterceptableIntegrand(s, 1.0)
+    { name = "Piecewise linear function";}
     virtual InterceptedSet intercept(const real *);
 };
 
