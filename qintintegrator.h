@@ -31,7 +31,7 @@ private:
     unsigned randCount;
     unsigned sParam;
     unsigned globalSeed;
-    double estimateQintVariance(std::vector<double> values, std::vector<int> index);
+    double estimateQintVariance(std::vector<double> &values, std::vector<int> &index);
 };
 
 class QINTPartitionIndexer
@@ -40,7 +40,7 @@ public:
     QINTPartitionIndexer(unsigned _p)
         : sParam(_p), partitionCount(1 << _p) {}
     virtual
-    std::vector<int> CreateIndex(t_sequence sequence) = 0;
+    std::vector<int> CreateIndex(const t_sequence &sequence) = 0;
 protected:
     unsigned sParam;
     unsigned partitionCount;
@@ -51,7 +51,7 @@ class CubicShapeIndexer : public QINTPartitionIndexer
 public:
     CubicShapeIndexer(unsigned _p) : QINTPartitionIndexer(_p) {}
     virtual
-    std::vector<int> CreateIndex(t_sequence sequence);
+    std::vector<int> CreateIndex(const t_sequence &sequence);
 };
 
 #endif // QINTINTEGRATOR_H

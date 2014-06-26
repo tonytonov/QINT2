@@ -72,7 +72,7 @@ Integrator::Status QintIntegrator::integrate(
     std::vector<std::vector<int>> indexes;
     indexes.reserve(randCount);
     unsigned i=0;
-    for (const auto x : interceptedSequences)
+    for (const auto &x : interceptedSequences)
     {
         auto currentIndex = indexer.CreateIndex(x);
         variances.push_back(estimateQintVariance(interceptedValues[i], currentIndex));
@@ -87,7 +87,7 @@ Integrator::Status QintIntegrator::integrate(
 }
 
 
-std::vector<int> CubicShapeIndexer::CreateIndex(t_sequence sequence)
+std::vector<int> CubicShapeIndexer::CreateIndex(const t_sequence& sequence)
 {
     std::vector<int> res;
     res.reserve(sequence.size());
@@ -113,7 +113,7 @@ std::vector<int> CubicShapeIndexer::CreateIndex(t_sequence sequence)
     return res;
 }
 
-double QintIntegrator::estimateQintVariance(std::vector<double> values, std::vector<int> index)
+double QintIntegrator::estimateQintVariance(std::vector<double> &values, std::vector<int> &index)
 {
     if (values.size() != index.size()) throw ("Sequence and index sizes do not match!");
     double totalVar = var(values);
