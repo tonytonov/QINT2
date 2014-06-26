@@ -148,10 +148,10 @@ void writeMethodComparison(InterceptableIntegrand& f, std::vector<Integrator*>& 
 
 int main()
 {
-    std::vector<int> s {40, 41, 42, 43, 44, 45};
+    std::vector<int> s {5, 10, 15, 20};
     std::vector<int> sparam {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
     int seed=42;
-    int maxEval=std::pow(2, 15);
+    int maxEval=std::pow(2, 12);
     int rc = 16;
 
 //    SequenceInterceptor x(45);
@@ -166,8 +166,8 @@ int main()
     {
         for (auto i_sparam : sparam)
         {
-            FI01_MorCaf1 f(i_s);
-            //FI03_PieceLin f(i_s);
+            //FI01_MorCaf1 f(i_s);
+            FI03_PieceLin f(i_s);
 
             MonteCarloPointSet<MersenneTwister> ps_mc;
             MCIntegrator integrator_mc(&ps_mc);

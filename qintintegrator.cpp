@@ -2,6 +2,7 @@
 #include <utils.h>
 #include <vector>
 #include <cmath>
+#include <limits>
 
 Integrator::Status QintIntegrator::integrate(
         Integrand &f,
@@ -23,6 +24,12 @@ Integrator::Status QintIntegrator::integrate(
 
     if (randCount == 0) return ERROR;
     int m = n / randCount;
+
+    if (m < std::pow(2, this->sParam))
+    {
+        ee.setNoErr(std::numeric_limits<double>::quiet_NaN());
+        return ERROR;
+    }
 
     std::vector<Statistic<>> stats;
     stats.reserve(randCount);
