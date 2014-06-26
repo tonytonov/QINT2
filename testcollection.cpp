@@ -29,14 +29,14 @@ InterceptedSet FI03_PieceLin::intercept(const real *x)
 {
     int d = this->getDimension();
     std::vector<real> v(x, x + d);
-    real value = 1.0;
+    real value = 0.0;
     real total = 0.0;
     for (int j = 0; j < d; j++)
     {
         if (v[j] <= 0.5 - double(j) / 2 / (j + 10)) {total = 0.0;}
         else if (v[j] >= 0.5 + double(j) / 2 / (j + 10)) {total = 1.0;}
         else {total = v[j] * (10 + (double)j) / j - 5.0 / j;}
-        value *= total * 2;
+        value += total * 2;
     }
     InterceptedSet res {value, v};
     return res;

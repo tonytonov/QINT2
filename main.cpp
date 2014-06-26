@@ -148,10 +148,10 @@ void writeMethodComparison(InterceptableIntegrand& f, std::vector<Integrator*>& 
 
 int main()
 {
-    std::vector<int> s {25, 30};
+    std::vector<int> s {5, 10, 15, 20, 25, 30};
     std::vector<int> sparam {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
     int seed=42;
-    int maxEval=std::pow(2, 12);
+    int maxEval=std::pow(2, 15);
     int rc = 16;
 
 //    SequenceInterceptor x(45);

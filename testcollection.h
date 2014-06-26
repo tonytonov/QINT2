@@ -34,7 +34,7 @@ public:
 class FI03_PieceLin : public InterceptableIntegrand
 {
 public:
-    FI03_PieceLin(int s) : InterceptableIntegrand(s, 1.0)
+    FI03_PieceLin(int s) : InterceptableIntegrand(s, s)
     { name = "Piecewise linear function";}
     virtual InterceptedSet intercept(const real *);
 };
