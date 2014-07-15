@@ -124,7 +124,8 @@ void writeMethodComparison(InterceptableIntegrand& f, std::vector<Integrator*>& 
                 S(f.getExactValue()) + "," +
                 "\'" + methodName + "\'," +
                 S(maxEval) + "," +
-                S(status == Integrator::Status::MAX_EVAL_REACHED) + "," +
+                S(std::log2(maxEval) - std::log2(randCount) == sParamQint ? 2 :
+                  status != Integrator::Status::MAX_EVAL_REACHED) + "," +
                 S(ee.getEstimate()) + "," +
                 S(ee.getError()) + "," +
                 S(rc) + "," +
@@ -148,7 +149,7 @@ void writeMethodComparison(InterceptableIntegrand& f, std::vector<Integrator*>& 
 
 int main()
 {
-    std::vector<int> s {5, 10, 15, 20, 25, 30};
+    std::vector<int> s {5, 10, 15, 20, 30, 50, 100};
     std::vector<int> sparam {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
     int seed=42;
     int maxEval=std::pow(2, 15);
@@ -166,7 +167,6 @@ int main()
     {
         for (auto i_sparam : sparam)
         {
-            //FI01_MorCaf1 f(i_s);
             FI03_PieceLin f(i_s);
 
             MonteCarloPointSet<MersenneTwister> ps_mc;

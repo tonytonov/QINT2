@@ -31,11 +31,27 @@ public:
     virtual InterceptedSet intercept(const real *);
 };
 
+class FI02_NormalDensity : public InterceptableIntegrand
+{
+public:
+    FI02_NormalDensity(int s) : InterceptableIntegrand(s, 1.0)
+    { name = "Normal density function";}
+    virtual InterceptedSet intercept(const real *);
+};
+
 class FI03_PieceLin : public InterceptableIntegrand
 {
 public:
     FI03_PieceLin(int s) : InterceptableIntegrand(s, s)
     { name = "Piecewise linear function";}
+    virtual InterceptedSet intercept(const real *);
+};
+
+class FI04_PieceLinEx : public InterceptableIntegrand
+{
+public:
+    FI04_PieceLinEx(int s) : InterceptableIntegrand(s, 1.0)
+    { name = "Piecewise linear extreme function";}
     virtual InterceptedSet intercept(const real *);
 };
 
