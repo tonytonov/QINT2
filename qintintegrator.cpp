@@ -14,8 +14,8 @@ Integrator::Status QintIntegrator::integrate(
 
     if (n == 0)
     {
-       ee.set(0.0, 0.0);
-       return ERROR;
+        ee.set(0.0, 0.0);
+        return ERROR;
     }
 
     ps->setCube(&h);
@@ -82,7 +82,21 @@ Integrator::Status QintIntegrator::integrate(
     double rqmcStdError = std::sqrt(var(estimates) / randCount);
     double mcStdError = std::sqrt(var(mixed_vals) / n);
     double qintStdError = std::sqrt(sum(variances) / randCount / randCount);
-    ee.set(qintEst, qintStdError);
+    switch (varOption)
+    {
+    case 1:
+        ee.set(qintEst, qintStdError);
+        break;
+    case 2:
+        ee.set(qintEst, mcStdError);
+        break;
+    case 3:
+        ee.set(qintEst, rqmcStdError);
+        break;
+    default:
+        break;
+    }
+
     return MAX_EVAL_REACHED;
 }
 
@@ -113,28 +127,48 @@ std::vector<int> CubicShapeIndexer::CreateIndex(const t_sequence& sequence)
     return res;
 }
 
+//double QintIntegrator::estimateQintVariance(std::vector<double> &values, std::vector<int> &index)
+//{
+//    if (values.size() != index.size()) throw ("Sequence and index sizes do not match!");
+//    double totalVar = var(values);
+//    double alphaTerm = 0;
+//    std::vector<double> alphas(std::pow(2, sParam));
+//    std::vector<unsigned> alphaCounters(std::pow(2, sParam));
+//    for (unsigned i=0; i<values.size(); i++)
+//    {
+//        alphas[index[i]] += values[i];
+//        ++alphaCounters[index[i]];
+//    }
+//    for (unsigned j=0; j<alphas.size(); j++)
+//    {
+//        alphas[j] = alphas[j] / alphaCounters[j] / std::pow(2, sParam);
+//    }
+//    for (unsigned i=0; i<alphas.size(); i++)
+//    {
+//        for (unsigned j=i; j<alphas.size(); j++)
+//        {
+//            alphaTerm += (alphas[i] - alphas[j]) * (alphas[i] - alphas[j]);
+//        }
+//    }
+//    return (totalVar - alphaTerm) / values.size();
+//}
+
 double QintIntegrator::estimateQintVariance(std::vector<double> &values, std::vector<int> &index)
 {
+    unsigned m = std::pow(2, sParam);
+    unsigned n = values.size() / m;
     if (values.size() != index.size()) throw ("Sequence and index sizes do not match!");
-    double totalVar = var(values);
-    double alphaTerm = 0;
-    std::vector<double> alphas(std::pow(2, sParam));
-    std::vector<unsigned> alphaCounters(std::pow(2, sParam));
-    for (unsigned i=0; i<values.size(); i++)
+    std::vector<double> alphas(m);
+    std::vector<unsigned> alphaCounters(m);
+    for (unsigned i = 0; i < n * m; i++)
     {
         alphas[index[i]] += values[i];
         ++alphaCounters[index[i]];
     }
-    for (unsigned j=0; j<alphas.size(); j++)
+    for (unsigned j = 0; j < m; j++)
     {
-        alphas[j] = alphas[j] / alphaCounters[j] / std::pow(2, sParam);
+        alphas[j] = alphas[j] / alphaCounters[j] / m * std::sqrt(n / (n - 1));
     }
-    for (unsigned i=0; i<alphas.size(); i++)
-    {
-        for (unsigned j=i; j<alphas.size(); j++)
-        {
-            alphaTerm += (alphas[i] - alphas[j]) * (alphas[i] - alphas[j]);
-        }
-    }
-    return (totalVar - alphaTerm) / values.size();
+    return sumsq(values) / (m * n) / (m * n) - sumsq(alphas) / n;
 }
+

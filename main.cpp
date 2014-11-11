@@ -78,7 +78,7 @@ void writeMethodComparison(InterceptableIntegrand& f, std::vector<Integrator*>& 
     EstErr ee;
     sqlite3 *db;
     //TODO : do smth with file locations and rc
-    int dbStatus = sqlite3_open("../qint.sqlite", &db);
+    int dbStatus = sqlite3_open("../qint_reborn.sqlite", &db);
     std::string createDBQuery =
             R"sql(CREATE TABLE IF NOT EXISTS results(
             hash INT PRIMARY KEY,
@@ -94,7 +94,7 @@ void writeMethodComparison(InterceptableIntegrand& f, std::vector<Integrator*>& 
             sparam INT,
             seed INT NOT NULL)
             )sql";
-    sqlite3_exec(db, createDBQuery.c_str(), 0, 0, 0);
+            sqlite3_exec(db, createDBQuery.c_str(), 0, 0, 0);
     for (const auto integrator : integratorList)
     {
         auto status = integrator->integrate(f, h, maxEval, 0, 0, ee);
@@ -124,8 +124,8 @@ void writeMethodComparison(InterceptableIntegrand& f, std::vector<Integrator*>& 
                 S(f.getExactValue()) + "," +
                 "\'" + methodName + "\'," +
                 S(maxEval) + "," +
-                S(std::log2(maxEval) - std::log2(randCount) == sParamQint ? 2 :
-                  status != Integrator::Status::MAX_EVAL_REACHED) + "," +
+                S(std::log2(maxEval) - std::log2(randCount) == sParamQint
+                  ? 2 : status != Integrator::Status::MAX_EVAL_REACHED) + "," +
                 S(ee.getEstimate()) + "," +
                 S(ee.getError()) + "," +
                 S(rc) + "," +
@@ -149,19 +149,19 @@ void writeMethodComparison(InterceptableIntegrand& f, std::vector<Integrator*>& 
 
 int main()
 {
-    std::vector<int> s {5, 10, 15, 20, 30, 50, 100};
+    std::vector<int> s {5, 10, 15, 20, 30, 50};
     std::vector<int> sparam {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-    int seed=42;
-    int maxEval=std::pow(2, 15);
+    int seed = 42;
+    int maxEval = std::pow(2, 15);
     int rc = 16;
 
-//    SequenceInterceptor x(45);
-//    SobolMatrix matrix_sobol;
-//    DigitalSeq2PointSet<real> ps_sobol(matrix_sobol, true);
-//    RQMCIntegrator integrator_sobol(&ps_sobol, rc, seed);
-//    Hypercube h(x.getDimension());
-//    EstErr ee;
-//    integrator_sobol.integrate(x, h, maxEval, 0, 0, ee);
+    //    SequenceInterceptor x(45);
+    //    SobolMatrix matrix_sobol;
+    //    DigitalSeq2PointSet<real> ps_sobol(matrix_sobol, true);
+    //    RQMCIntegrator integrator_sobol(&ps_sobol, rc, seed);
+    //    Hypercube h(x.getDimension());
+    //    EstErr ee;
+    //    integrator_sobol.integrate(x, h, maxEval, 0, 0, ee);
 
     for (auto i_s : s)
     {
@@ -176,11 +176,17 @@ int main()
             SobolMatrix matrix_sobol;
             DigitalSeq2PointSet<real> ps_sobol(matrix_sobol, true);
             RQMCIntegrator integrator_sobol(&ps_sobol, rc, seed);
-            QintIntegrator integrator_sobol_qint(&ps_sobol, rc, i_sparam, seed);
+            QintIntegrator integrator_sobol_qint(&ps_sobol, rc, i_sparam, seed, 1);
+            QintIntegrator integrator_sobol_qint_mc(&ps_sobol, rc, i_sparam, seed, 2);
+            QintIntegrator integrator_sobol_qint_rqmc(&ps_sobol, rc, i_sparam, seed, 3);
 
             std::vector<Integrator*> integratorList
             {
-                &integrator_mc, &integrator_sobol, &integrator_sobol_qint
+                &integrator_mc,
+                &integrator_sobol,
+                &integrator_sobol_qint,
+//                &integrator_sobol_qint_mc,
+//                &integrator_sobol_qint_rqmc
             };
             std::cout << std::to_string(i_s) << " " << std::flush;
             //runMethodComparison(f, integratorList, maxEval);

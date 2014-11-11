@@ -19,18 +19,20 @@ public:
     QintIntegrator(Digital2PointSet* _ps,
                    unsigned _rn = 10,
                    unsigned _sp = 1,
-                   unsigned _gs = 1)
-        : ps(_ps), randCount(_rn), sParam(_sp), globalSeed(_gs) {}
+                   unsigned _gs = 1,
+                   unsigned _vo = 1)
+        : ps(_ps), randCount(_rn), sParam(_sp), globalSeed(_gs), varOption(_vo) {}
 
     virtual
     Status integrate(
-          Integrand &, const Hypercube &, Index maxEval,
-          real reqAbsError, real reqRelError, EstErr &ee);
+            Integrand &, const Hypercube &, Index maxEval,
+            real reqAbsError, real reqRelError, EstErr &ee);
 private:
     Digital2PointSet* ps;
     unsigned randCount;
     unsigned sParam;
     unsigned globalSeed;
+    unsigned varOption;
     double estimateQintVariance(std::vector<double> &values, std::vector<int> &index);
 };
 

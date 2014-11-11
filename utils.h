@@ -35,6 +35,12 @@ std::vector<T> square(const std::vector<T> v)
 }
 
 template<typename T>
+T sumsq(const std::vector<T> v)
+{
+    return (sum(square(v)));
+}
+
+template<typename T>
 T var(const std::vector<T> v)
 {
     T m = mean(v);

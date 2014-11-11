@@ -13,8 +13,8 @@ Integrator::Status RQMCIntegrator::integrate(
 
     if (n == 0)
     {
-       ee.set(0.0, 0.0);
-       return ERROR;
+        ee.set(0.0, 0.0);
+        return ERROR;
     }
 
     ps->setCube(&h);

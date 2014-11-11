@@ -18,8 +18,8 @@ public:
 
     virtual
     Status integrate(
-          Integrand &, const Hypercube &, Index maxEval,
-          real reqAbsError, real reqRelError, EstErr &ee);
+            Integrand &, const Hypercube &, Index maxEval,
+            real reqAbsError, real reqRelError, EstErr &ee);
 private:
     Digital2PointSet* ps;
     unsigned int randCount;
