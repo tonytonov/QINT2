@@ -71,3 +71,13 @@ InterceptedSet FI04_PieceLinEx::intercept(const real *x)
     InterceptedSet res {value, v};
     return res;
 }
+
+InterceptedSet FI05_CubicPolynomial::intercept(const real *x)
+{
+    int d = this->getDimension();
+    std::vector<real> v(x, x + d);
+    real f = 1;
+    for (const auto x : v) f *= (x * x * x + 0.75);
+    InterceptedSet res {f, v};
+    return res;
+}

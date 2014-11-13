@@ -55,4 +55,12 @@ public:
     virtual InterceptedSet intercept(const real *);
 };
 
+class FI05_CubicPolynomial : public InterceptableIntegrand
+{
+public:
+    FI05_CubicPolynomial(int s) : InterceptableIntegrand(s, 1.0)
+    { name = "Cubic Polynomial";}
+    virtual InterceptedSet intercept(const real *);
+};
+
 #endif // TESTCOLLECTION_H

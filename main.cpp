@@ -149,11 +149,12 @@ void writeMethodComparison(InterceptableIntegrand& f, std::vector<Integrator*>& 
 
 int main()
 {
-    std::vector<int> s {5, 10, 15, 20, 30, 50};
-    std::vector<int> sparam {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+    std::vector<int> s {1, 2, 3, 4, 5, 10, 15, 20, 30};
+    std::vector<int> sparam(8); // sparam(k) is 0:k
+    std::iota(std::begin(sparam), std::end(sparam), 0);
     int seed = 42;
-    int maxEval = std::pow(2, 15);
-    int rc = 16;
+    int rc = std::pow(2, 4);
+    int maxEval = std::pow(2, 1 + *std::max_element(sparam.begin(), sparam.end())) * rc;
 
     //    SequenceInterceptor x(45);
     //    SobolMatrix matrix_sobol;
@@ -167,7 +168,7 @@ int main()
     {
         for (auto i_sparam : sparam)
         {
-            FI03_PieceLin f(i_s);
+            FI05_CubicPolynomial f(i_s);
 
             MonteCarloPointSet<MersenneTwister> ps_mc;
             MCIntegrator integrator_mc(&ps_mc);
