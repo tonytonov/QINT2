@@ -80,6 +80,7 @@ Integrator::Status QintIntegrator::integrate(
         ++i;
     }
     double rqmcStdError = std::sqrt(var(estimates) / randCount);
+    if (randCount == 1) rqmcStdError = -1;
     double mcStdError = std::sqrt(var(mixed_vals) / n);
     double qintStdError = std::sqrt(sum(variances) / randCount / randCount);
     switch (varOption)

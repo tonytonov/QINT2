@@ -151,11 +151,12 @@ void writeMethodComparison(InterceptableIntegrand& f, std::vector<Integrator*>& 
 int main()
 {
     std::vector<int> s {1, 2, 3, 4, 5, 10, 15, 20, 30};
-    std::vector<int> sparam(8); // sparam(k) is 0:k
+    int limit = 15;
+    std::vector<int> sparam(limit); // sparam(k) is 0:k
     std::iota(std::begin(sparam), std::end(sparam), 0);
     int seed = 42;
-    int rc = std::pow(2, 4);
-    int maxEval = std::pow(2, 1 + *std::max_element(sparam.begin(), sparam.end())) * rc;
+    int rc = 1;
+    int maxEval = std::pow(2, limit);
 
     //    SequenceInterceptor x(45);
     //    SobolMatrix matrix_sobol;
