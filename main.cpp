@@ -16,6 +16,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <stdexcept>
 #include <unistd.h>
 #include <sys/types.h>
 #include <pwd.h>
@@ -77,8 +78,8 @@ void writeMethodComparison(InterceptableIntegrand& f, std::vector<Integrator*>& 
     Hypercube h(f.getDimension());
     EstErr ee;
     sqlite3 *db;
-    //TODO : do smth with file locations and rc
-    int dbStatus = sqlite3_open("../qint_reborn.sqlite", &db);
+    int dbStatus = sqlite3_open_v2("../qint.sqlite", &db, SQLITE_OPEN_CREATE | SQLITE_OPEN_READWRITE, NULL);
+    if (dbStatus) throw std::runtime_error("Database cannot be opened!");
     std::string createDBQuery =
             R"sql(CREATE TABLE IF NOT EXISTS results(
             hash INT PRIMARY KEY,
