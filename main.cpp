@@ -151,8 +151,8 @@ void writeMethodComparison(InterceptableIntegrand& f, std::vector<Integrator*>& 
 int main()
 {
     std::vector<int> s {1, 2, 3, 4, 5, 10, 15, 20, 30};
-    int limit = 15;
-    std::vector<int> sparam(limit); // sparam(k) is 0:k
+    int limit = 8; //8-16
+    std::vector<int> sparam(limit + 1); // sparam(k) is 0:k
     std::iota(std::begin(sparam), std::end(sparam), 0);
     int seed = 42;
     int rc = 1;

@@ -168,7 +168,14 @@ double QintIntegrator::estimateQintVariance(std::vector<double> &values, std::ve
     }
     for (unsigned j = 0; j < m; j++)
     {
-        alphas[j] = alphas[j] / alphaCounters[j] / m * std::sqrt(n / (n - 1));
+        if (n == 1)
+        {
+          alphas[j] = alphas[j] / alphaCounters[j] / m;
+        } else
+        {
+          alphas[j] = alphas[j] / alphaCounters[j] / m * std::sqrt(n / (n - 1));
+        }
+
     }
     return sumsq(values) / (m * n) / (m * n) - sumsq(alphas) / n;
 }
