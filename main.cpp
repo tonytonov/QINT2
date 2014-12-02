@@ -150,11 +150,12 @@ void writeMethodComparison(InterceptableIntegrand& f, std::vector<Integrator*>& 
 
 int main()
 {
-    std::vector<int> s {1, 2, 3, 4, 5, 10, 15, 20, 30};
-    int limit = 8; //8-16
+    std::vector<int> dim {1, 2, 3, 4, 5, 10, 15, 20, 30};
+    int limit = 16; //8-16
     std::vector<int> sparam(limit + 1); // sparam(k) is 0:k
     std::iota(std::begin(sparam), std::end(sparam), 0);
-    int seed = 42;
+    std::vector<int> seed(15);
+    std::iota(std::begin(seed), std::end(seed), 0);
     int rc = 1;
     int maxEval = std::pow(2, limit);
 
@@ -166,34 +167,52 @@ int main()
     //    EstErr ee;
     //    integrator_sobol.integrate(x, h, maxEval, 0, 0, ee);
 
-    for (auto i_s : s)
+    int progress = 0;
+    int total = seed.size() * dim.size() * sparam.size();
+    int barWidth = 70;
+
+    for (auto i_seed : seed)
     {
-        for (auto i_sparam : sparam)
+        for (auto i_dim : dim)
         {
-            FI05_CubicPolynomial f(i_s);
-
-            MonteCarloPointSet<MersenneTwister> ps_mc;
-            MCIntegrator integrator_mc(&ps_mc);
-            integrator_mc.randomize(seed);
-
-            SobolMatrix matrix_sobol;
-            DigitalSeq2PointSet<real> ps_sobol(matrix_sobol, true);
-            RQMCIntegrator integrator_sobol(&ps_sobol, rc, seed);
-            QintIntegrator integrator_sobol_qint(&ps_sobol, rc, i_sparam, seed, 1);
-            QintIntegrator integrator_sobol_qint_mc(&ps_sobol, rc, i_sparam, seed, 2);
-            QintIntegrator integrator_sobol_qint_rqmc(&ps_sobol, rc, i_sparam, seed, 3);
-
-            std::vector<Integrator*> integratorList
+            for (auto i_sparam : sparam)
             {
-                &integrator_mc,
-                &integrator_sobol,
-                &integrator_sobol_qint,
-//                &integrator_sobol_qint_mc,
-//                &integrator_sobol_qint_rqmc
-            };
-            std::cout << std::to_string(i_s) << " " << std::flush;
-            //runMethodComparison(f, integratorList, maxEval);
-            writeMethodComparison(f, integratorList, maxEval, rc, i_sparam, seed);
+                FI05_CubicPolynomial f(i_dim);
+
+                MonteCarloPointSet<MersenneTwister> ps_mc;
+                MCIntegrator integrator_mc(&ps_mc);
+                integrator_mc.randomize(i_seed);
+
+                SobolMatrix matrix_sobol;
+                DigitalSeq2PointSet<real> ps_sobol(matrix_sobol, true);
+                RQMCIntegrator integrator_sobol(&ps_sobol, rc, i_seed);
+                QintIntegrator integrator_sobol_qint(&ps_sobol, rc, i_sparam, i_seed, 1);
+                //QintIntegrator integrator_sobol_qint_mc(&ps_sobol, rc, i_sparam, i_seed, 2);
+                //QintIntegrator integrator_sobol_qint_rqmc(&ps_sobol, rc, i_sparam, i_seed, 3);
+
+                std::vector<Integrator*> integratorList
+                {
+                    &integrator_mc,
+                            &integrator_sobol,
+                            &integrator_sobol_qint,
+                            //&integrator_sobol_qint_mc,
+                            //&integrator_sobol_qint_rqmc
+                };
+                //runMethodComparison(f, integratorList, maxEval);
+                writeMethodComparison(f, integratorList, maxEval, rc, i_sparam, i_seed);
+
+                //update progress bar
+                ++progress;
+                std::cout << "[";
+                int pos = barWidth * progress / total;
+                for (int i = 0; i < barWidth; ++i) {
+                    if (i < pos) std::cout << "=";
+                    else if (i == pos) std::cout << ">";
+                    else std::cout << " ";
+                }
+                std::cout << "] " << int(1.0 * progress / total * 100) << " %\r";
+                std::cout.flush();
+            }
         }
     }
 }
