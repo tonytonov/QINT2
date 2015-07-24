@@ -1,0 +1,15 @@
+# install hintlib
+./autogen.sh
+./configure --enable-static --prefix=/usr --build=i386-linux-gnu "CFLAGS=-m32" "CXXFLAGS=-m32" "LDFLAGS=-m32"
+make -j 4
+# correct architecture and version
+sudo checkinstall
+sudo ldconfig
+
+# check if architecture is correct
+mkdir junk
+cd junk
+ar x /usr/lib/libhintlib.a
+file *.o
+cd ..
+rm -rf junk
