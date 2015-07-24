@@ -42,7 +42,7 @@ Integrator::Status RQMCIntegrator::integrate(
     for (auto x : stats) estimates.push_back(x.getMean() * h.getVolume());
     double rqmcEst = sum(estimates) / randCount;
     double rqmcStdError = std::sqrt(var(estimates) / randCount);
-    if (randCount == 1) rqmcStdError = -1;
+    if (randCount == 1) rqmcStdError = 0;
     ee.set(rqmcEst, rqmcStdError);
     return MAX_EVAL_REACHED;
 }
