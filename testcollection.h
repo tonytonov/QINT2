@@ -63,4 +63,20 @@ public:
     virtual InterceptedSet intercept(const real *);
 };
 
+class FI06_Oscillatory : public InterceptableIntegrand
+{
+public:
+    FI06_Oscillatory(int s) : InterceptableIntegrand(s, 1.0)
+    { name = "Oscillatory function";}
+    virtual InterceptedSet intercept(const real *);
+};
+
+class FI07_Singular : public InterceptableIntegrand
+{
+public:
+    FI07_Singular(int s) : InterceptableIntegrand(s, 1.0)
+    { name = "Singular function";}
+    virtual InterceptedSet intercept(const real *);
+};
+
 #endif // TESTCOLLECTION_H

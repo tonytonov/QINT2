@@ -81,3 +81,29 @@ InterceptedSet FI05_CubicPolynomial::intercept(const real *x)
     InterceptedSet res {f, v};
     return res;
 }
+
+InterceptedSet FI06_Oscillatory::intercept(const real *x)
+{
+    int d = this->getDimension();
+    std::vector<real> v(x, x + d);
+    real f = 1;
+    for (int j = 0; j < d; j++)
+    {
+        f *= (j + 1) * (cos((j + 1) * v[j]) / sin(j + 1));
+    }
+    InterceptedSet res {f, v};
+    return res;
+}
+
+InterceptedSet FI07_Singular::intercept(const real *x)
+{
+    int d = this->getDimension();
+    std::vector<real> v(x, x + d);
+    real f = 1;
+    for (int j = 0; j < d; j++)
+    {
+        f *= 1.0 / (j + 1) * (pow(v[j], 1.0 / (j + 1) - 1));
+    }
+    InterceptedSet res {f, v};
+    return res;
+}
