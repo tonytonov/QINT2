@@ -79,4 +79,12 @@ public:
     virtual InterceptedSet intercept(const real *);
 };
 
+class FI08_InfVariation : public InterceptableIntegrand
+{
+public:
+    FI08_InfVariation(int s) : InterceptableIntegrand(s, 1.0)
+    { name = "Function with infinite variation";}
+    virtual InterceptedSet intercept(const real *);
+};
+
 #endif // TESTCOLLECTION_H

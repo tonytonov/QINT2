@@ -181,7 +181,7 @@ int main()
                     int maxEval = std::pow(2, i_lim);
                     for (auto i_sparam : sparam)
                     {
-                        FI07_Singular f(i_dim);
+                        FI08_InfVariation f(i_dim);
 
                         MonteCarloPointSet<MersenneTwister> ps_mc;
                         MCIntegrator integrator_mc(&ps_mc);

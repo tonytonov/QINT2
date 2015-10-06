@@ -107,3 +107,22 @@ InterceptedSet FI07_Singular::intercept(const real *x)
     InterceptedSet res {f, v};
     return res;
 }
+
+InterceptedSet FI08_InfVariation::intercept(const real *x)
+{
+    int d = this->getDimension();
+    std::vector<real> v(x, x + d);
+    real rad = pow(tgamma((double) d / 2 + 1) / (2 * pow(M_PI, (double) d / 2)), 1.0 / d);
+
+    real r = 0;
+    for (int j = 0; j < d; j++)
+    {
+        r += (v[j] - 0.5) * (v[j] - 0.5);
+    }
+    r = sqrt(r);
+
+    real f = 0;
+    if (r <= rad) f = 2; else f = 0;
+    InterceptedSet res {f, v};
+    return res;
+}
