@@ -126,3 +126,17 @@ InterceptedSet FI08_InfVariation::intercept(const real *x)
     InterceptedSet res {f, v};
     return res;
 }
+
+InterceptedSet FI09_SingularFinVar::intercept(const real *x)
+{
+    int d = this->getDimension();
+    std::vector<real> v(x, x + d);
+    real f = 1;
+    for (int j = 0; j < d; j++)
+    {
+        double t = (j + 2.0) / (2 * j);
+        f *= t * (pow(v[j], t - 1));
+    }
+    InterceptedSet res {f, v};
+    return res;
+}

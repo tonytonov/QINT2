@@ -87,4 +87,12 @@ public:
     virtual InterceptedSet intercept(const real *);
 };
 
+class FI09_SingularFinVar : public InterceptableIntegrand
+{
+public:
+    FI09_SingularFinVar(int s) : InterceptableIntegrand(s, 1.0)
+    { name = "Weakly singular function";}
+    virtual InterceptedSet intercept(const real *);
+};
+
 #endif // TESTCOLLECTION_H

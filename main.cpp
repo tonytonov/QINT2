@@ -153,7 +153,7 @@ int main()
     std::vector<int> dim {1, 2, 3, 4, 5, 10, 15, 20, 30};
     std::vector<int> limit {8, 9, 10, 11, 12, 13, 14, 15, 16};
     std::vector<int> randCount {1, 16};
-    std::vector<int> seed(15);
+    std::vector<int> seed(16);
     std::iota(std::begin(seed), std::end(seed), 0);
 
     //    SequenceInterceptor x(45);
@@ -181,7 +181,7 @@ int main()
                     int maxEval = std::pow(2, i_lim);
                     for (auto i_sparam : sparam)
                     {
-                        FI08_InfVariation f(i_dim);
+                        FI09_SingularFinVar f(i_dim);
 
                         MonteCarloPointSet<MersenneTwister> ps_mc;
                         MCIntegrator integrator_mc(&ps_mc);
